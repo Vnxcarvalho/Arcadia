@@ -1,6 +1,6 @@
 [package]
 name = "alethe"
-version = "1.7.9"
+version = "1.7.10"
 description = "Alethe — terminal multiplexer GUI"
 authors = ["Kauã Miguel"]
 license = "AGPL-3.0-or-later"
