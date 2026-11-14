@@ -36,6 +36,8 @@ Mac synced through: `v1.7.0` (`80e44a3`)
 
 ## Unreleased
 
+- `pending` · `ui` · feat: Open project buttons, Arcadia terminal title and About logo
+  - Files: `src/lib/i18n/messages/*.ts` (`home.projectsEmptyAction`, `ui.sidebar.emptyAction`, `ws.createProject`, `ws.emptyProjectAction` now say Open project; `home.quickTerminalTitle` is `arcadia@workspace:~`), `src/components/modals/preferences/AboutPage.tsx` and `AboutPage.module.css` (the version card draws the Arcadia icon). No persisted data changes.
 - `pending` · `ui` · fix: load the GitHub repository list once instead of on every render
   - Files: `src/components/modals/GithubRepoPicker.tsx`, `src/components/modals/GithubRepoPicker.test.tsx`. The picker requested the repository list again after each redraw (the translate function changes identity every render), exhausting the account's hourly API limit. The Mac app must request the list once per opening. No persisted data changes.
 - `pending` · `backend` · fix: list GitHub repositories when an organization blocks the full list

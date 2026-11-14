@@ -12,12 +12,11 @@
 }
 
 .appMark {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
-  background: var(--fg);
-  mask: url('../../../assets/alethe-mark.svg') center / contain no-repeat;
-  -webkit-mask: url('../../../assets/alethe-mark.svg') center / contain no-repeat;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
 }
 
 .creatorCard {

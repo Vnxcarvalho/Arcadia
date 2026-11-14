@@ -33,6 +33,7 @@ import {
   releasePageUrl,
 } from '../../../lib/releases'
 import { openDataFolder, openInBrowser, openLogsFolder } from '../../../lib/tauri/filesystem'
+import { getAppIconImage } from '../../../lib/themeIcons'
 import { checkForUpdate, installPendingUpdate, installRelease } from '../../../lib/updater'
 import { useUiStore } from '../../../stores/uiStore'
 import controls from '../controls.module.css'
@@ -105,7 +106,12 @@ function VersionSection({ version }: { version: string }) {
       <div className={about.stack}>
         <div className={styles.versionCard}>
           <div className={about.identity}>
-            <span className={about.appMark} aria-hidden="true" />
+            <img
+              src={getAppIconImage('arcadia')}
+              alt=""
+              className={about.appMark}
+              draggable={false}
+            />
             <div className={styles.versionCardCopy}>
               <strong>Arcadia</strong>
               <span>

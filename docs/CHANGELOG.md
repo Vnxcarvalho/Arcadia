@@ -11,8 +11,8 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 ## [Unreleased]
 
 ### Added
-- **Clone your GitHub repositories from Arcadia.** The Home has a "clone from github" button, and New
-  project has "Choose from my GitHub"; both sign you in
+- **Clone your GitHub repositories from Arcadia.** The Home has a "clone repository" button, and New
+  project has "Clone repository"; both sign you in
   with GitHub (a code you confirm in the browser) and lists your repositories, including private and
   organization ones, with search. Picking one fills in the repository and the project name, and the
   clone uses your account, so private repositories work. The access token stays in the system
@@ -453,6 +453,9 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
   installer instead.
 
 ### Changed
+- **"Create project" is now "Open project".** The buttons in the empty Home, the empty sidebar and the
+  empty workspace use the new name. The Home terminal title reads `arcadia@workspace:~`, and the
+  version card in Preferences → About shows the Arcadia logo instead of the old Alethe mark.
 - **The Arcadia logo is the pixel-art bust with the red blindfold.** It is the default app icon and
   profile picture and replaces the Elite artwork
   icons, which are removed; the Elite colour themes stay. The `.exe`, installer, taskbar
