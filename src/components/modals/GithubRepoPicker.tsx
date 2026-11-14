@@ -1,5 +1,5 @@
 import { Github, Loader2, Lock } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useT } from '../../lib/i18n'
 import {
@@ -30,6 +30,10 @@ function signInErrorKey(error: unknown): MessageKey {
 /** Sign in with GitHub and pick one of the account's repositories to clone. */
 export function GithubRepoPicker({ onPick }: { onPick: (repo: GithubRepo) => void }) {
   const t = useT()
+  // `useT()` returns a new function on every render; keeping it out of the effect dependencies stops
+  // the repository list from being requested again after each render.
+  const tRef = useRef(t)
+  tRef.current = t
   const [status, setStatus] = useState<GithubAccountStatus | null>(null)
   const [device, setDevice] = useState<GithubDeviceStart | null>(null)
   const [repos, setRepos] = useState<GithubRepo[] | null>(null)
@@ -45,13 +49,13 @@ export function GithubRepoPicker({ onPick }: { onPick: (repo: GithubRepo) => voi
     } catch (err) {
       if (String(err).includes('session_expired')) {
         setStatus(await githubAccountStatus())
-        setError(t('githubAccount.sessionExpired'))
+        setError(tRef.current('githubAccount.sessionExpired'))
       } else {
-        setError(t('githubAccount.loadFailed', { error: String(err) }))
+        setError(tRef.current('githubAccount.loadFailed', { error: String(err) }))
       }
       setRepos([])
     }
-  }, [t])
+  }, [])
 
   useEffect(() => {
     let cancelled = false

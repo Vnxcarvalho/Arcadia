@@ -604,6 +604,9 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 
 ### Fixed
 
+- **The GitHub repository list no longer asks GitHub again and again.** Opening it repeated the
+  request after every redraw, which used up the hourly API limit of your account and left the list
+  loading forever. It now asks once.
 - **Your GitHub repositories load when an organization blocks the full list.** If GitHub refused the
   list with an error 403 (an organization that restricts OAuth apps or requires SAML), Arcadia now
   shows your own and shared repositories anyway, and any error shows GitHub's own message.

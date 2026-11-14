@@ -36,6 +36,8 @@ Mac synced through: `v1.7.0` (`80e44a3`)
 
 ## Unreleased
 
+- `pending` · `ui` · fix: load the GitHub repository list once instead of on every render
+  - Files: `src/components/modals/GithubRepoPicker.tsx`, `src/components/modals/GithubRepoPicker.test.tsx`. The picker requested the repository list again after each redraw (the translate function changes identity every render), exhausting the account's hourly API limit. The Mac app must request the list once per opening. No persisted data changes.
 - `pending` · `backend` · fix: list GitHub repositories when an organization blocks the full list
   - Files: `src-tauri/src/github_account.rs` (`github_account_repos` retries with `affiliation=owner,collaborator` after a 403 and returns GitHub's error message). No persisted data changes.
 - `pending` · `ui` · feat: pixel-art bust with the red blindfold as the Arcadia logo
