@@ -36,6 +36,8 @@ Mac synced through: `v1.7.0` (`80e44a3`)
 
 ## Unreleased
 
+- `pending` · `backend` · fix: list GitHub repositories when an organization blocks the full list
+  - Files: `src-tauri/src/github_account.rs` (`github_account_repos` retries with `affiliation=owner,collaborator` after a 403 and returns GitHub's error message). No persisted data changes.
 - `pending` · `ui` · feat: pixel-art bust with the red blindfold as the Arcadia logo
   - Files: `src/assets/theme-icons/{,32,48,64}/arcadia.png` (now the same art as the Carvalho icon), `src-tauri/icons/*` regenerated from a 1024px master with transparent corners. No persisted data changes.
 - `pending` · `ui` · feat: artwork background on the Home and a larger terminal card

@@ -265,9 +265,20 @@ async fn api_get(token: &str, url: &str) -> Result<Value, String> {
         return Err("session_expired".to_string());
     }
     if !(200..300).contains(&status) {
-        return Err(format!("github returned {status}"));
+        let body: Value = resp.json().await.unwrap_or(Value::Null);
+        return Err(api_error(status, &body));
     }
     resp.json().await.map_err(|e| format!("json parse: {e}"))
+}
+
+/// "github returned 403: <GitHub's own message>", so the reason reaches the user.
+fn api_error(status: u16, body: &Value) -> String {
+    match body.get("message").and_then(Value::as_str) {
+        Some(message) if !message.trim().is_empty() => {
+            format!("github returned {status}: {message}")
+        }
+        _ => format!("github returned {status}"),
+    }
 }
 
 #[tauri::command]
@@ -333,26 +344,14 @@ pub(crate) fn parse_repos(page: &Value) -> Vec<GithubRepo> {
         .unwrap_or_default()
 }
 
-/// The signed-in user's repositories (own, collaborator and organization), newest activity first.
-#[tauri::command]
-pub async fn github_account_repos(app: AppHandle) -> Result<Vec<GithubRepo>, String> {
-    let token = stored_token(&app).ok_or_else(|| "not_connected".to_string())?;
+/// Pages of `/user/repos` for one affiliation filter.
+async fn list_repos(token: &str, affiliation: &str) -> Result<Vec<GithubRepo>, String> {
     let mut repos = Vec::new();
     for page in 1..=MAX_PAGES {
         let url = format!(
-            "{API_BASE}/user/repos?per_page={REPOS_PER_PAGE}&page={page}&sort=pushed\
-             &affiliation=owner,collaborator,organization_member"
+            "{API_BASE}/user/repos?per_page={REPOS_PER_PAGE}&page={page}&sort=pushed             &affiliation={affiliation}"
         );
-        let body = match api_get(&token, &url).await {
-            Ok(body) => body,
-            Err(error) => {
-                if error == "session_expired" {
-                    let _ = clear_session(&app);
-                }
-                return Err(error);
-            }
-        };
-        let batch = parse_repos(&body);
+        let batch = parse_repos(&api_get(token, &url).await?);
         let full = batch.len() >= REPOS_PER_PAGE;
         repos.extend(batch);
         if !full {
@@ -360,6 +359,24 @@ pub async fn github_account_repos(app: AppHandle) -> Result<Vec<GithubRepo>, Str
         }
     }
     Ok(repos)
+}
+
+/// The signed-in user's repositories (own, collaborator and organization), newest activity first.
+/// Organizations that restrict OAuth apps or enforce SAML can answer 403 to the full listing; the
+/// user's own and collaborator repositories are listed anyway.
+#[tauri::command]
+pub async fn github_account_repos(app: AppHandle) -> Result<Vec<GithubRepo>, String> {
+    let token = stored_token(&app).ok_or_else(|| "not_connected".to_string())?;
+    let result = match list_repos(&token, "owner,collaborator,organization_member").await {
+        Err(error) if error.starts_with("github returned 403") => {
+            list_repos(&token, "owner,collaborator").await
+        }
+        other => other,
+    };
+    if matches!(&result, Err(error) if error == "session_expired") {
+        let _ = clear_session(&app);
+    }
+    result
 }
 
 #[cfg(test)]
@@ -391,6 +408,18 @@ mod tests {
         assert!(repos[0].private);
         assert_eq!(repos[0].updated_at.as_deref(), Some("2026-11-01T10:00:00Z"));
         assert_eq!(repos[0].clone_url, "https://github.com/me/app.git");
+    }
+
+    #[test]
+    fn api_errors_carry_the_message_github_sent() {
+        assert_eq!(
+            api_error(
+                403,
+                &json!({ "message": "Resource protected by organization SAML enforcement." })
+            ),
+            "github returned 403: Resource protected by organization SAML enforcement."
+        );
+        assert_eq!(api_error(500, &Value::Null), "github returned 500");
     }
 
     #[test]

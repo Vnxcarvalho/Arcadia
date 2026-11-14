@@ -604,6 +604,9 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 
 ### Fixed
 
+- **Your GitHub repositories load when an organization blocks the full list.** If GitHub refused the
+  list with an error 403 (an organization that restricts OAuth apps or requires SAML), Arcadia now
+  shows your own and shared repositories anyway, and any error shows GitHub's own message.
 - **The in-app update now finishes and reopens Arcadia on Windows.** The installer started by the
   updater was killed when the app closed, so the version never changed and nothing reopened. The
   app now lets go of its process guard right before handing over to the installer, and puts it back
