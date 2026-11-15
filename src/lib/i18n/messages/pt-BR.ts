@@ -1486,6 +1486,10 @@ export const ptBR: Record<MessageKey, string> = {
     'O Alethe agora é Arcadia: novo nome, nova logo e nova arte do instalador. Seus projetos, perfis e configurações continuam onde estão.',
   'whatsNew.v177.note2':
     'A logo do Arcadia agora é o ícone do app e a foto de perfil padrão. Os ícones da arte Elite foram removidos; os temas de cores Elite continuam.',
+  'whatsNew.v1715.note1':
+    'A configuração inicial agora usa sua conta do GitHub: ao entrar, seu nome e sua foto são preenchidos em vez de pedir que você digite o usuário.',
+  'whatsNew.v1715.note2':
+    'As telas de código do login do GitHub mostram o endereço a abrir e avisam quando o navegador não abriu; no Windows, os links abrem pelo tratador do sistema.',
   'whatsNew.v1714.note1':
     'O instalador do Windows na página da release agora se chama Arcadia-Setup.exe, e os links de download do README apontam para ele.',
   'whatsNew.v1713.note1':
