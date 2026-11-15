@@ -1240,6 +1240,8 @@ export const zhCN: Record<MessageKey, string> = {
     'Alethe 现在叫 Arcadia：全新的名称、标志和安装程序图案。你的项目、配置文件和设置保持不变。',
   'whatsNew.v177.note2':
     'Arcadia 标志现在是默认的应用图标和个人资料头像。Elite 插画图标已移除，Elite 配色主题保留。',
+  'whatsNew.v1714.note1':
+    '发布页面上的 Windows 安装程序现在名为 Arcadia-Setup.exe，README 中的下载链接也指向它。',
   'whatsNew.v1713.note1':
     'Antigravity 代理团队现在可以在 Antigravity 沙盒中工作：负责人可以打开成员并向其发送任务，终端外观类似 tmux 会话，小任务完成得更快。',
   'whatsNew.v1713.note2':

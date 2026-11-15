@@ -1486,6 +1486,8 @@ export const ptBR: Record<MessageKey, string> = {
     'O Alethe agora é Arcadia: novo nome, nova logo e nova arte do instalador. Seus projetos, perfis e configurações continuam onde estão.',
   'whatsNew.v177.note2':
     'A logo do Arcadia agora é o ícone do app e a foto de perfil padrão. Os ícones da arte Elite foram removidos; os temas de cores Elite continuam.',
+  'whatsNew.v1714.note1':
+    'O instalador do Windows na página da release agora se chama Arcadia-Setup.exe, e os links de download do README apontam para ele.',
   'whatsNew.v1713.note1':
     'Os times de agentes do Antigravity agora funcionam a partir do sandbox do Antigravity: o líder abre membros e envia tarefas, os terminais ficam como uma sessão tmux e tarefas pequenas terminam bem mais rápido.',
   'whatsNew.v1713.note2':

@@ -1459,6 +1459,8 @@ export const en = {
     'Alethe is now Arcadia: a new name, a new logo and new installer artwork. Your projects, profiles and settings stay where they are.',
   'whatsNew.v177.note2':
     'The Arcadia logo is now the default app icon and profile picture. The Elite artwork icons are gone; the Elite colour themes stay.',
+  'whatsNew.v1714.note1':
+    'The Windows installer on the release page is now named Arcadia-Setup.exe, and the download links in the README point at it.',
   'whatsNew.v1713.note1':
     "Antigravity agent teams now work from Antigravity's sandbox: the lead opens members and sends them tasks, the terminals look like a tmux session, and small tasks finish much faster.",
   'whatsNew.v1713.note2':
