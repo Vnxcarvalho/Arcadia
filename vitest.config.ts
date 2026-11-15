@@ -8,5 +8,8 @@ export default defineConfig({
     globals: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     setupFiles: ['./src/test/setup.ts'],
+    // Node 26 ships its own `localStorage`, which stays undefined without a backing file and
+    // hides the one jsdom provides. Turn it off so the tests get jsdom's.
+    execArgv: ['--no-experimental-webstorage'],
   },
 })

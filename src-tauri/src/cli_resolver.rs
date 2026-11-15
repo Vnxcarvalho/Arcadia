@@ -175,6 +175,7 @@ pub fn command_builder_for_terminal(
     }
     scrub_editor_environment(&mut builder);
     crate::child_env::scrub_pty(&mut builder);
+    crate::child_env::scrub_agent_session(&mut builder);
     builder.env_remove("EDITOR");
     builder.env_remove("VISUAL");
     builder.env_remove("CLAUDECODE");

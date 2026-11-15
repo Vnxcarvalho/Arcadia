@@ -63,6 +63,7 @@ export function createTerminalsSlice({
   return {
     createTerminal: (projectId, args) => {
       let terminal = makeDefaultTerminal(args)
+      let opensOwnView = false
       update((state) => {
         const sourceProject = state.projects.find((p) => p.id === projectId)
         const inheritedCwd = getProjectDefaultCwd(sourceProject)
@@ -85,8 +86,6 @@ export function createTerminalsSlice({
               }
             : p,
         )
-        const project = projects.find((p) => p.id === projectId)
-        const layout = project?.layoutMode ?? 'auto'
         const existing = state.workspace.containers.find((c) => c.projectId === projectId)
         const containers = existing
           ? state.workspace.containers.map((c) =>
@@ -94,7 +93,10 @@ export function createTerminalsSlice({
                 ? { ...c, paneIds: [...c.paneIds, terminal.id], lastUsedAt: Date.now() }
                 : c,
             )
-          : [...state.workspace.containers, newContainer(projectId, [terminal.id], layout)]
+          : state.workspace.containers
+        // A project that is not in the current view opens in a view of its own, below, instead of
+        // being squeezed in next to the project the user is looking at.
+        opensOwnView = !existing
         return {
           projects,
           workspace: {
@@ -108,6 +110,7 @@ export function createTerminalsSlice({
           },
         }
       })
+      if (opensOwnView) get().openProjectWorkspace(projectId)
       return terminal
     },
 

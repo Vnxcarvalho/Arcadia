@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseTeamRoles, teamHelperPrompt, teamPrompt } from './agentTeam'
+import { leadMessage, parseTeamRoles, teamHelperPrompt, teamPrompt } from './agentTeam'
 import { buildAgentLaunch } from './sessionLaunch'
 
 describe('parseTeamRoles', () => {
@@ -48,6 +48,7 @@ describe('opening members on request', () => {
   it('tells a plain terminal how to open a team, without quotes', () => {
     const prompt = teamHelperPrompt()
     expect(prompt).toContain('alethe-team open ROLE TASK')
+    expect(prompt).toContain('alethe-team send ROLE TASK')
     expect(prompt).not.toMatch(/["'\n]/)
   })
 })
@@ -85,5 +86,29 @@ describe('an Antigravity opening prompt', () => {
       'conv-1',
       '--x',
     ])
+  })
+})
+
+describe('sending tasks to members that are already open', () => {
+  it('teaches the lead to send every task, not only the first', () => {
+    const prompt = teamPrompt(null, ['front', 'back'])
+    expect(prompt).toContain('alethe-team send ROLE TASK')
+    expect(prompt).toContain('for as many tasks as the user gives you')
+    expect(prompt).toContain('never started')
+    expect(prompt).not.toMatch(/["'\n]/)
+  })
+
+  it('tells a member that a message from the lead is a new task', () => {
+    const prompt = teamPrompt('front', ['front', 'back'])
+    expect(prompt).toContain('A message that starts with [lead] is a new task')
+    expect(prompt).toContain('Keep taking new tasks after your first one')
+    expect(prompt).not.toMatch(/["'\n]/)
+  })
+
+  it('marks what the lead sends and keeps it on one plain line', () => {
+    expect(leadMessage(`add the "login" route\nand test it`)).toBe(
+      '[lead] add the login route and test it',
+    )
+    expect(leadMessage('x'.repeat(5000))).toHaveLength(4000)
   })
 })

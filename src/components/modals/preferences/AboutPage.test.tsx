@@ -54,22 +54,14 @@ describe('AboutPage', () => {
     useProjectsStore.setState({ ...structuredClone(EMPTY_PROJECTS_FILE), hydrated: true })
   })
 
-  it('introduces the creator and links to their profiles', async () => {
+  it('names the maintainer without social links or contribution buttons', async () => {
     render(<AboutPage />)
-    expect(screen.getByText('Kauã Miguel')).toBeInTheDocument()
+    expect(screen.getByText('Alan Carvalho')).toBeInTheDocument()
     expect(await screen.findByText('com.kc1t.alethe · Tauri 2.8.0')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Instagram' }))
-    expect(openInBrowser).toHaveBeenCalledWith('https://www.instagram.com/kc1t_dev')
-  })
-
-  it('opens the contribution pages on GitHub', () => {
-    render(<AboutPage />)
-    fireEvent.click(screen.getByRole('button', { name: 'Open a pull request' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Report a bug' }))
-    expect(openInBrowser).toHaveBeenCalledWith('https://github.com/Vnxcarvalho/Alethe-2.0/compare')
-    expect(openInBrowser).toHaveBeenCalledWith(
-      'https://github.com/Vnxcarvalho/Alethe-2.0/issues/new?template=bug_report.yml',
-    )
+    expect(screen.queryByText(/@kc1t_dev/)).not.toBeInTheDocument()
+    for (const name of ['GitHub', 'YouTube', 'Instagram', 'LinkedIn', 'Report a bug']) {
+      expect(screen.queryByRole('button', { name })).not.toBeInTheDocument()
+    }
   })
 
   it('lists only older releases and asks before installing one', async () => {

@@ -20,7 +20,10 @@ function Shortcut({ value }: { value: string }) {
 export function WorkspaceEmptyState({ actions }: { actions: WorkspaceEmptyAction[] }) {
   return (
     <div className={styles.root}>
-      <div className={styles.mark} aria-hidden="true" />
+      <div className={styles.mark} aria-hidden="true">
+        <span className={styles.markDots} />
+        <span className={styles.markBlindfold} />
+      </div>
       <div className={styles.actions}>
         {actions.map((action) => (
           <button key={action.label} type="button" onClick={action.onClick}>

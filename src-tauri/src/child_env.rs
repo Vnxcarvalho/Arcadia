@@ -30,6 +30,38 @@ pub fn scrub_pty(builder: &mut CommandBuilder) {
     }
 }
 
+/// Names of the variables a Claude Code session leaves in the environment of a program it starts.
+/// Arcadia launched from such a session (an installer run by an agent, for instance) hands them to
+/// every terminal: `NO_COLOR` turns the colours off in all the agents, and the `CLAUDE_CODE_*`
+/// ones, which include a session token, make `claude` think it runs inside another session.
+/// `NO_COLOR` is only treated as inherited when `CLAUDECODE` shows the session started it, so a
+/// user who sets it on purpose keeps it.
+pub fn inherited_agent_session_vars(names: impl Iterator<Item = String>) -> Vec<String> {
+    let names: Vec<String> = names.collect();
+    if !names.iter().any(|name| name.eq_ignore_ascii_case("CLAUDECODE")) {
+        return Vec::new();
+    }
+    names
+        .into_iter()
+        .filter(|name| {
+            let upper = name.to_ascii_uppercase();
+            upper.starts_with("CLAUDE_CODE_")
+                || matches!(
+                    upper.as_str(),
+                    "CLAUDECODE" | "CLAUDECODE_PARENT_PID" | "CLAUDE_PID" | "NO_COLOR"
+                )
+        })
+        .collect()
+}
+
+/// Keeps what an agent session that launched Arcadia left in the environment out of the terminals.
+pub fn scrub_agent_session(builder: &mut CommandBuilder) {
+    let names = std::env::vars_os().filter_map(|(key, _)| key.into_string().ok());
+    for name in inherited_agent_session_vars(names) {
+        builder.env_remove(name);
+    }
+}
+
 /// Applies the overrides to a helper the user sees, such as the browser `xdg-open` launches.
 pub fn scrub_command(command: &mut Command) -> &mut Command {
     for (key, value) in overrides() {
@@ -162,6 +194,46 @@ mod tests {
             ("PATH", "/usr/bin:/tmp/.mount_aletheXY/bin"),
         ]);
         assert!(out.is_empty());
+    }
+
+    fn names(list: &[&str]) -> Vec<String> {
+        inherited_agent_session_vars(list.iter().map(|name| name.to_string()))
+    }
+
+    #[test]
+    fn drops_what_a_claude_code_session_leaves_behind() {
+        let mut dropped = names(&[
+            "PATH",
+            "CLAUDECODE",
+            "NO_COLOR",
+            "CLAUDE_CODE_ENTRYPOINT",
+            "CLAUDE_CODE_MESSAGING_TOKEN",
+            "CLAUDE_PID",
+            "COLORTERM",
+        ]);
+        dropped.sort();
+        assert_eq!(
+            dropped,
+            vec![
+                "CLAUDECODE",
+                "CLAUDE_CODE_ENTRYPOINT",
+                "CLAUDE_CODE_MESSAGING_TOKEN",
+                "CLAUDE_PID",
+                "NO_COLOR",
+            ]
+        );
+    }
+
+    #[test]
+    fn keeps_no_color_when_the_user_set_it_without_a_session() {
+        assert!(names(&["PATH", "NO_COLOR"]).is_empty());
+        assert!(names(&["PATH", "CLAUDE_CODE_FOO"]).is_empty());
+    }
+
+    #[test]
+    fn matches_windows_names_in_any_case() {
+        let dropped = names(&["ClaudeCode", "No_Color", "Claude_Code_Session_Id"]);
+        assert_eq!(dropped.len(), 3);
     }
 
     #[test]

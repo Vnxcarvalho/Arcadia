@@ -434,7 +434,8 @@ export default function App() {
     if (preferences.accountCreated && preferences.onboardingDone) {
       useUiStore.getState().openModal_('welcome')
     }
-    useUiStore.getState().setActiveView(preferences.alwaysStartOnHome ? 'home' : 'workspace')
+    // Arcadia always opens on the Home; the saved `alwaysStartOnHome` preference is no longer read.
+    useUiStore.getState().setActiveView('home')
   }, [hydrated])
 
   useEffect(() => {

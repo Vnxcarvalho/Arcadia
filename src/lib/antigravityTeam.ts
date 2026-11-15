@@ -1,16 +1,22 @@
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 
 import { useProjectsStore } from '../stores/projectsStore'
-import { parseTeamRoles, teamPrompt } from './agentTeam'
+import { leadMessage, parseTeamRoles, teamPrompt } from './agentTeam'
+import { writePty } from './tauri'
 import { findPtyOwner, mainVerticalLayout } from './tmuxBridge'
-import type { Terminal } from './types'
+import type { Project, Terminal } from './types'
 
 /** `agy -i` starts the session with this prompt and stays interactive. */
 const INITIAL_PROMPT_FLAG = '-i'
 /** Sent by `tmux_bridge.rs` when a lead runs `alethe-team open <role> [task]`. */
 const OPEN_MEMBER_EVENT = 'agent-team-open'
+/** Sent by `tmux_bridge.rs` when a lead runs `alethe-team send <role> <message>`. */
+const SEND_MEMBER_EVENT = 'agent-team-send'
+/** Time between typing a task and pressing Enter, so the agent takes it as one submission. */
+const SUBMIT_DELAY_MS = 150
 
 type OpenMemberPayload = { leaderPtyId: string; role: string; task?: string | null }
+type SendMemberPayload = { leaderPtyId: string; role: string; message: string }
 
 /** Opens one Antigravity terminal named `name`, with `role` (null for the lead) as its first prompt. */
 async function openMember(args: {
@@ -32,7 +38,7 @@ async function openMember(args: {
     firstTab: {
       type: 'antigravity',
       cwd,
-      extraArgs: [...extraArgs, INITIAL_PROMPT_FLAG, teamPrompt(role, roles, task)],
+      extraArgs: [...extraArgs, INITIAL_PROMPT_FLAG, teamPrompt(role, roles, task, cwd)],
     },
   })
   // A terminal is labelled with its agent until it is renamed.
@@ -49,7 +55,7 @@ export async function createAntigravityTeam(args: {
   cwd: string
   roles: readonly string[]
   extraArgs?: string[]
-}): Promise<void> {
+}): Promise<string> {
   const { projectId, cwd, roles, extraArgs } = args
   const lead = await openMember({ projectId, cwd, name: 'lead', role: null, roles, extraArgs })
   const mates: Terminal[] = []
@@ -73,6 +79,7 @@ export async function createAntigravityTeam(args: {
       mates.map((mate) => mate.id),
     ),
   )
+  return lead.id
 }
 
 /**
@@ -112,10 +119,68 @@ export async function openTeamMember(payload: OpenMemberPayload): Promise<void> 
     )
 }
 
-/** Listens for members that a lead asks Alethe to open from its own terminal. */
+/** The terminal of the member called `role` in the team that the terminal running `leaderPtyId` leads. */
+export function findTeamMember(
+  projects: Project[],
+  leaderPtyId: string,
+  role: string,
+): Terminal | null {
+  const owner = findPtyOwner(projects, leaderPtyId)
+  if (!owner) return null
+  const project = projects.find((candidate) => candidate.id === owner.projectId)
+  if (!project) return null
+  const lead =
+    project.terminals.find((terminal) => terminal.id === owner.terminal.teamLeaderId) ??
+    owner.terminal
+  const wanted = role.trim().toLowerCase()
+  return (
+    project.terminals.find(
+      (terminal) =>
+        terminal.teamLeaderId === lead.id && terminal.name.trim().toLowerCase() === wanted,
+    ) ?? null
+  )
+}
+
+/**
+ * A lead sent a task to a member that is already open: types it into the member's terminal and
+ * presses Enter, so the member starts on it right away. False when the member is not running.
+ */
+export async function sendToTeamMember(
+  payload: SendMemberPayload,
+  write: (ptyId: string, data: string) => Promise<void> = writePty,
+  wait: (ms: number) => Promise<void> = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+): Promise<boolean> {
+  const member = findTeamMember(
+    useProjectsStore.getState().projects,
+    payload.leaderPtyId,
+    payload.role,
+  )
+  const ptyId = member?.tabs.find((tab) => tab.ptyId)?.ptyId
+  if (!ptyId) return false
+  await write(ptyId, leadMessage(payload.message))
+  await wait(SUBMIT_DELAY_MS)
+  await write(ptyId, '\r')
+  return true
+}
+
+/** Listens for members a lead asks Arcadia to open, and for tasks it sends to members already open. */
 export function listenAgentTeamOpen(): () => void {
-  const stop: Promise<UnlistenFn> = listen<OpenMemberPayload>(OPEN_MEMBER_EVENT, ({ payload }) => {
-    void openTeamMember(payload)
-  })
-  return () => void stop.then((unlisten) => unlisten())
+  const stopOpen: Promise<UnlistenFn> = listen<OpenMemberPayload>(
+    OPEN_MEMBER_EVENT,
+    ({ payload }) => {
+      void openTeamMember(payload)
+    },
+  )
+  const stopSend: Promise<UnlistenFn> = listen<SendMemberPayload>(
+    SEND_MEMBER_EVENT,
+    ({ payload }) => {
+      void sendToTeamMember(payload).catch((error) => {
+        console.error('[Arcadia] could not send the task to the team member:', error)
+      })
+    },
+  )
+  return () => {
+    void stopOpen.then((unlisten) => unlisten())
+    void stopSend.then((unlisten) => unlisten())
+  }
 }

@@ -452,6 +452,7 @@ pub fn run() {
             projects::load_projects,
             projects::save_projects,
             projects::clone_github_repo,
+            projects::remove_managed_clone,
             cli_resolver::discover_provider_models,
             profiles::list_profiles,
             profiles::list_profile_summaries,

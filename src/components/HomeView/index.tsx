@@ -29,6 +29,7 @@ import { useUiStore } from '../../stores/uiStore'
 import { resolveUnrestrictedFlag } from '../../lib/agentProviders'
 import type { AgentType, BuiltinAgentType, Project } from '../../lib/types'
 import { AgentIcon } from '../icons/AgentIcons'
+import { ToastKindIcon } from '../ToastKindIcon'
 import { Avatar } from '../ui/Avatar'
 import { EmptyState } from '../EmptyState'
 import { computeStreak } from './ActivityGraph'
@@ -550,11 +551,19 @@ export function HomeView() {
                 <li key={n.id} className={styles.notifItem}>
                   <span
                     className={`${styles.notifIcon} ${
-                      n.agent ? notifAgentClass(n.agent) : styles.notifNeutral
+                      n.agent
+                        ? notifAgentClass(n.agent)
+                        : n.kind === 'success'
+                          ? styles.notifSuccess
+                          : n.kind === 'error'
+                            ? styles.notifError
+                            : styles.notifNeutral
                     }`}
                   >
                     {n.agent ? (
                       <AgentIcon type={n.agent} size={14} theme={preferences.uiTheme} />
+                    ) : n.kind ? (
+                      <ToastKindIcon kind={n.kind} size={13} />
                     ) : (
                       <Bell size={13} />
                     )}

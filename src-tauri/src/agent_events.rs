@@ -29,6 +29,11 @@ fn check_token(request: &tiny_http::Request) -> bool {
         .any(|h| h.field.equiv("X-Alethe-Token") && h.value.as_str() == expected)
 }
 
+/// Whether `candidate` is the listener token (for requests that arrive as files, not HTTP).
+pub fn token_matches(candidate: &str) -> bool {
+    candidate == init_token()
+}
+
 fn listener_addr(port: u16) -> String {
     format!("{HOST}:{port}")
 }
@@ -647,6 +652,7 @@ pub fn start_listener(app: AppHandle) {
 
         LISTENER_PORT.store(port, Ordering::SeqCst);
         eprintln!("[agent_events] ouvindo em {}", listener_addr(port));
+        crate::tmux_bridge::watch_spool(app.clone(), port);
 
         for mut request in server.incoming_requests() {
             let url = request.url().to_string();

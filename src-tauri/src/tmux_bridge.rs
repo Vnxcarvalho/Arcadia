@@ -25,6 +25,9 @@ const TMUX_VERSION: &str = "tmux 3.4";
 /// The first argument the `alethe-team` shim sends, so its calls are told apart from tmux's.
 pub const TEAM_COMMAND: &str = "alethe-team";
 pub const OPEN_MEMBER_EVENT: &str = "agent-team-open";
+pub const SEND_MEMBER_EVENT: &str = "agent-team-send";
+/// The longest task a lead can send to a member in one `alethe-team send`.
+const MAX_TEAM_MESSAGE: usize = 4000;
 
 static ENABLED: AtomicBool = AtomicBool::new(false);
 
@@ -92,6 +95,12 @@ pub enum Effect {
         leader_pty: String,
         role: String,
         task: String,
+    },
+    /// A lead ran `alethe-team send <role> <message>`: a new task for a member that is already open.
+    SendMember {
+        leader_pty: String,
+        role: String,
+        message: String,
     },
     Kill {
         pty_id: String,
@@ -175,7 +184,7 @@ impl Bridge {
         match sub {
             // Not a tmux command: the helper an Antigravity lead runs to open a team member. Its
             // `pane` is the terminal's own PTY id (`ALETHE_TEAM_PTY`).
-            TEAM_COMMAND => open_member(rest, request.pane.as_deref()),
+            TEAM_COMMAND => team_command(rest, request.pane.as_deref()),
             "-V" => (Reply::ok(format!("{TMUX_VERSION}\n")), Vec::new()),
             "display-message" => {
                 let pane = resolve_pane(&state, flag(rest, "-t"), &caller);
@@ -561,10 +570,12 @@ fn translate_command(line: &str) -> (Option<String>, String) {
     }
 }
 
-/// `alethe-team open <role> [task…]`.
-fn open_member(args: &[String], leader_pty: Option<&str>) -> (Reply, Vec<Effect>) {
-    let usage = "usage: alethe-team open <role> [task]\n";
-    let (Some("open"), Some(role)) = (args.first().map(String::as_str), args.get(1)) else {
+/// `alethe-team open <role> [task…]` or `alethe-team send <role> <message…>`.
+fn team_command(args: &[String], leader_pty: Option<&str>) -> (Reply, Vec<Effect>) {
+    let usage = "usage: alethe-team open <role> [task] | alethe-team send <role> <message>\n";
+    let (Some(action @ ("open" | "send")), Some(role)) =
+        (args.first().map(String::as_str), args.get(1))
+    else {
         return (Reply::fail(usage), Vec::new());
     };
     let valid_role = !role.is_empty()
@@ -582,12 +593,38 @@ fn open_member(args: &[String], leader_pty: Option<&str>) -> (Reply, Vec<Effect>
             Vec::new(),
         );
     };
+    let text = args[2..].join(" ");
+    if action == "open" {
+        return (
+            Reply::ok(format!("opening {role} next to this terminal\n")),
+            vec![Effect::OpenMember {
+                leader_pty: leader_pty.to_string(),
+                role: role.clone(),
+                task: text,
+            }],
+        );
+    }
+    let message = text.trim();
+    if message.is_empty() {
+        return (
+            Reply::fail("alethe-team: send needs the task to give the member\n"),
+            Vec::new(),
+        );
+    }
+    if message.chars().count() > MAX_TEAM_MESSAGE {
+        return (
+            Reply::fail(format!(
+                "alethe-team: the task is longer than {MAX_TEAM_MESSAGE} characters; put the details in TEAM.md\n"
+            )),
+            Vec::new(),
+        );
+    }
     (
-        Reply::ok(format!("opening {role} next to this terminal\n")),
-        vec![Effect::OpenMember {
+        Reply::ok(format!("sent to {role}\n")),
+        vec![Effect::SendMember {
             leader_pty: leader_pty.to_string(),
             role: role.clone(),
-            task: args[2..].join(" "),
+            message: message.to_string(),
         }],
     )
 }
@@ -752,6 +789,46 @@ pub fn apply_env(command: &mut portable_pty::CommandBuilder, pty_id: &str, agent
     command.env("CLAUDE_CODE_TMUX_TRUECOLOR", "1");
 }
 
+/// Answers `alethe-team` calls that arrive as files (see `tmux_shim::spool_dir`). Only team
+/// commands carrying the listener token are served; every file is removed once read.
+pub fn watch_spool(app: AppHandle, port: u16) {
+    let dir = crate::tmux_shim::spool_dir(&port.to_string());
+    let _ = std::fs::create_dir_all(&dir);
+    std::thread::spawn(move || loop {
+        std::thread::sleep(std::time::Duration::from_millis(250));
+        let Ok(entries) = std::fs::read_dir(&dir) else { continue };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("req") {
+                continue;
+            }
+            let text = std::fs::read_to_string(&path).unwrap_or_default();
+            let _ = std::fs::remove_file(&path);
+            let reply = serve_spooled(&app, &text);
+            let part = path.with_extension("rpart");
+            if std::fs::write(&part, serde_json::to_string(&reply).unwrap_or_default()).is_ok() {
+                let _ = std::fs::rename(&part, path.with_extension("rep"));
+            }
+        }
+    });
+}
+
+fn serve_spooled(app: &AppHandle, text: &str) -> Reply {
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(text) else {
+        return Reply::fail("alethe-team: unreadable request\n");
+    };
+    let token = value["token"].as_str().unwrap_or("");
+    if !crate::agent_events::token_matches(token) {
+        return Reply::fail("alethe-team: request refused\n");
+    }
+    match serde_json::from_value::<Request>(value) {
+        Ok(request) if request.args.first().map(String::as_str) == Some(TEAM_COMMAND) => {
+            handle(app, &request)
+        }
+        _ => Reply::fail("alethe-team: only team commands are accepted here\n"),
+    }
+}
+
 /// Runs one shim request: updates the registry, then performs what the command asked for.
 pub fn handle(app: &AppHandle, request: &Request) -> Reply {
     let (mut reply, effects) = bridge().plan(request);
@@ -807,6 +884,16 @@ pub fn handle(app: &AppHandle, request: &Request) -> Reply {
                 let _ = app.emit(
                     OPEN_MEMBER_EVENT,
                     json!({ "leaderPtyId": leader_pty, "role": role, "task": task }),
+                );
+            }
+            Effect::SendMember {
+                leader_pty,
+                role,
+                message,
+            } => {
+                let _ = app.emit(
+                    SEND_MEMBER_EVENT,
+                    json!({ "leaderPtyId": leader_pty, "role": role, "message": message }),
                 );
             }
             Effect::Write { pty_id, data } => {
@@ -892,6 +979,49 @@ mod tests {
                 task: "fix the menu".into(),
             }]
         );
+    }
+
+    #[test]
+    fn a_lead_sends_a_new_task_to_a_member_that_is_already_open() {
+        let bridge = Bridge::default();
+        let (reply, effects) = run(
+            &bridge,
+            "pty-lead",
+            &["alethe-team", "send", "back", "add", "the", "login", "route"],
+        );
+        assert_eq!(reply.code, 0);
+        assert_eq!(
+            effects,
+            vec![Effect::SendMember {
+                leader_pty: "pty-lead".into(),
+                role: "back".into(),
+                message: "add the login route".into(),
+            }]
+        );
+    }
+
+    #[test]
+    fn sending_needs_a_task_a_valid_role_and_a_known_caller() {
+        let bridge = Bridge::default();
+        let (reply, effects) = run(&bridge, "pty-lead", &["alethe-team", "send", "back"]);
+        assert_eq!(reply.code, 1);
+        assert!(effects.is_empty());
+        let (reply, effects) = run(&bridge, "pty-lead", &["alethe-team", "send", "bad role!", "x"]);
+        assert_eq!(reply.code, 1);
+        assert!(effects.is_empty());
+        let long = "x".repeat(MAX_TEAM_MESSAGE + 1);
+        let (reply, effects) = run(
+            &bridge,
+            "pty-lead",
+            &["alethe-team", "send", "back", long.as_str()],
+        );
+        assert_eq!(reply.code, 1);
+        assert!(effects.is_empty());
+        let outside = bridge.plan(&Request {
+            args: vec!["alethe-team".into(), "send".into(), "back".into(), "hi".into()],
+            pane: None,
+        });
+        assert_eq!(outside.0.code, 1);
     }
 
     #[test]

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { pickDirectory } from '../../lib/dialog'
 import { AGENT_SANDBOX_ENABLED } from '../../lib/featureFlags'
 import { useT } from '../../lib/i18n'
-import { cloneGithubRepo, readProjectMarker } from '../../lib/tauri'
+import { describeCloneError } from '../../lib/cloneError'
+import { cloneGithubRepoOutcome, readProjectMarker } from '../../lib/tauri'
 import { GROUP_COLORS, type Project } from '../../lib/types'
 import { wslTargetFor } from '../../lib/wsl'
 import { useProjectsStore } from '../../stores/projectsStore'
@@ -125,24 +126,26 @@ export function NewProjectModal() {
       pushToast({
         title: t('crud.cloningRepoTitle'),
         body: t('crud.cloningRepoBody', { url: trimmedGithub }),
-        agent: 'claude',
+        kind: 'progress',
       })
       try {
         // The chosen folder (if any) becomes the clone's parent; an empty
         // string lets the backend resolve the default. The folder name comes
         // from the repo URL.
-        await cloneGithubRepo(trimmedGithub, defaultCwd.trim())
+        const cloned = await cloneGithubRepoOutcome(trimmedGithub, defaultCwd.trim())
+        // The project works in the clone, so its terminals and agent teams open in the right folder.
+        useProjectsStore.getState().relocateProject(project.id, cloned.path)
         pushToast({
-          title: t('crud.repoClonedTitle'),
-          body: t('crud.repoClonedBody'),
-          agent: 'claude',
+          title: t(cloned.alreadyCloned ? 'crud.repoAlreadyClonedTitle' : 'crud.repoClonedTitle'),
+          body: t('crud.repoClonedBody', { path: cloned.path }),
+          kind: 'success',
         })
       } catch (err) {
         console.error('[NewProjectModal] failed cloning GitHub repo:', err)
         pushToast({
           title: t('crud.cloneErrorTitle'),
-          body: String(err),
-          agent: 'claude',
+          body: describeCloneError(err, t),
+          kind: 'error',
         })
       }
       return

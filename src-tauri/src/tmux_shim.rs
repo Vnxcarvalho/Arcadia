@@ -63,6 +63,42 @@ mod tests {
     }
 }
 
+/// Where the shim leaves requests when it cannot reach the app's listener. Antigravity runs its
+/// commands in a sandbox that blocks loopback TCP and every folder but the temp one, so the temp
+/// folder is the one place both sides can use.
+pub fn spool_dir(port: &str) -> std::path::PathBuf {
+    std::env::temp_dir().join("arcadia-team").join(port)
+}
+
+/// Hands the request to the app through `spool_dir` and waits for its answer.
+fn spool_call(port: &str, body: &str, token: &str) -> Result<String, String> {
+    let dir = spool_dir(port);
+    std::fs::create_dir_all(&dir).map_err(|error| error.to_string())?;
+    let nonce = format!(
+        "{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0)
+    );
+    let mut request: Value = serde_json::from_str(body).map_err(|error| error.to_string())?;
+    request["token"] = json!(token);
+    let pending = dir.join(format!("{nonce}.part"));
+    std::fs::write(&pending, request.to_string()).map_err(|error| error.to_string())?;
+    std::fs::rename(&pending, dir.join(format!("{nonce}.req"))).map_err(|error| error.to_string())?;
+    let answer = dir.join(format!("{nonce}.rep"));
+    for _ in 0..300 {
+        if let Ok(text) = std::fs::read_to_string(&answer) {
+            let _ = std::fs::remove_file(&answer);
+            return Ok(text);
+        }
+        std::thread::sleep(Duration::from_millis(100));
+    }
+    let _ = std::fs::remove_file(dir.join(format!("{nonce}.req")));
+    Err("Alethe did not answer".to_string())
+}
+
 /// Forwards this process's arguments to the app and exits with the app's answer.
 pub fn run() -> ! {
     let team = std::env::current_exe().is_ok_and(|path| is_team_path(&path));
@@ -85,21 +121,24 @@ pub fn run() -> ! {
          Content-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
         body.len()
     );
-    let response = TcpStream::connect(format!("127.0.0.1:{port}"))
-        .and_then(|mut stream| {
-            stream.set_read_timeout(Some(Duration::from_secs(30)))?;
-            stream.write_all(request.as_bytes())?;
-            let mut raw = Vec::new();
-            stream.read_to_end(&mut raw)?;
-            Ok(String::from_utf8_lossy(&raw).into_owned())
-        })
-        .unwrap_or_else(|error| fail(&format!("alethe-tmux: cannot reach Alethe: {error}")));
-
-    let payload = response
-        .split_once("\r\n\r\n")
-        .map(|(_, rest)| rest)
-        .unwrap_or("");
-    let Ok(reply) = serde_json::from_str::<Value>(payload) else {
+    let direct = TcpStream::connect(format!("127.0.0.1:{port}")).and_then(|mut stream| {
+        stream.set_read_timeout(Some(Duration::from_secs(30)))?;
+        stream.write_all(request.as_bytes())?;
+        let mut raw = Vec::new();
+        stream.read_to_end(&mut raw)?;
+        Ok(String::from_utf8_lossy(&raw).into_owned())
+    });
+    let payload = match direct {
+        Ok(response) => response
+            .split_once("\r\n\r\n")
+            .map(|(_, rest)| rest.to_string())
+            .unwrap_or_default(),
+        // A sandboxed Antigravity cannot open the socket: the team helper falls back to the spool.
+        Err(_) if team => spool_call(&port, &body, &token)
+            .unwrap_or_else(|error| fail(&format!("alethe-team: cannot reach Alethe: {error}"))),
+        Err(error) => fail(&format!("alethe-tmux: cannot reach Alethe: {error}")),
+    };
+    let Ok(reply) = serde_json::from_str::<Value>(&payload) else {
         fail("alethe-tmux: unexpected reply from Alethe");
     };
     // A GUI-subsystem build can have no console to write to; a failed write must not abort.

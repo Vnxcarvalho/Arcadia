@@ -152,6 +152,7 @@ export function RecentChatsModal() {
       })
       setSubTabSessionId(project.id, created.id, created.activeTabId, entry.id)
       closeModal()
+      useUiStore.getState().requestPaneFocus(created.id)
     } catch (err) {
       setError(String(err))
     } finally {

@@ -17,6 +17,7 @@ import { useProjectsStore } from '../../stores/projectsStore'
 import { useUiStore } from '../../stores/uiStore'
 import { PaneArea } from './PaneArea'
 import styles from './ProjectContainer.module.css'
+import { TeamStatusBar } from './TeamStatusBar'
 import { WorkspaceEmptyState } from './WorkspaceEmptyState'
 
 export type ProjectContainerProps = {
@@ -235,6 +236,7 @@ export const ProjectContainer = memo(function ProjectContainer({
           />
         )}
       </div>
+      <TeamStatusBar project={project} />
     </div>
   )
 })

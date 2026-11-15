@@ -8,13 +8,33 @@
   user-select: none;
 }
 
+/* The Arcadia bust, faint behind the shortcuts: the dots take the text colour and the blindfold the
+   error colour, so any theme tints it. */
 .mark {
-  width: clamp(112px, 18vw, 190px);
-  aspect-ratio: 1;
+  position: relative;
+  width: clamp(110px, 16vw, 158px);
+  aspect-ratio: 316 / 484;
+  margin-bottom: 20px;
+}
+
+.markDots,
+.markBlindfold {
+  position: absolute;
+  inset: 0;
+}
+
+.markDots {
   background: var(--fg);
-  opacity: 0.045;
-  mask: url('../../assets/alethe-mark.svg') center / contain no-repeat;
-  -webkit-mask: url('../../assets/alethe-mark.svg') center / contain no-repeat;
+  opacity: 0.14;
+  mask: url('../../assets/arcadia-bust-dots.png') center / contain no-repeat;
+  -webkit-mask: url('../../assets/arcadia-bust-dots.png') center / contain no-repeat;
+}
+
+.markBlindfold {
+  background: var(--status-offline);
+  opacity: 0.2;
+  mask: url('../../assets/arcadia-bust-blindfold.png') center / contain no-repeat;
+  -webkit-mask: url('../../assets/arcadia-bust-blindfold.png') center / contain no-repeat;
 }
 
 .actions {

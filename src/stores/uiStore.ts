@@ -68,6 +68,9 @@ export type MemorySample = MemoryStats & {
   ts: number
 }
 
+/** What a notification reports, for the ones that come from no agent: shown with a neutral icon. */
+export type ToastKind = 'progress' | 'success' | 'error'
+
 export type InAppToast = {
   id: string
   title: string
@@ -75,6 +78,8 @@ export type InAppToast = {
   createdAt: number
   /** Agent that originated the notification and determines its icon and color. */
   agent?: AgentType
+  /** Picks a neutral icon and colour when no agent is involved. */
+  kind?: ToastKind
   /** Offers next steps. A toast carrying any waits longer before dismissing itself. */
   actions?: { label: string; run: () => void; quiet?: boolean }[]
 }
@@ -201,6 +206,7 @@ type UiState = {
     title: string
     body: string
     agent?: AgentType
+    kind?: ToastKind
     actions?: { label: string; run: () => void; quiet?: boolean }[]
     /** Record in history without showing an ephemeral banner. */
     silent?: boolean
@@ -355,7 +361,7 @@ export const useUiStore = create<UiState>((set) => ({
   setAgentCanvasSession: (session) => set({ agentCanvasSession: session }),
   setInspectorPty: (ptyId) => set({ inspectorPtyId: ptyId }),
   setAgentCanvasBudget: (usd) => set({ agentCanvasBudgetUsd: usd }),
-  pushToast: ({ title, body, agent, actions, silent }) =>
+  pushToast: ({ title, body, agent, kind, actions, silent }) =>
     set((s) => {
       const now = Date.now()
       const last = s.notifications[0]
@@ -374,6 +380,7 @@ export const useUiStore = create<UiState>((set) => ({
         actions,
         createdAt: now,
         agent,
+        kind,
       }
       const notifications = [entry, ...s.notifications].slice(0, MAX_NOTIFICATIONS)
       if (silent) return { notifications }

@@ -62,8 +62,29 @@ export async function gitListBranches(repoRoot: string): Promise<string[]> {
   return invoke<string[]>('git_list_branches', { repoRoot })
 }
 
+export type CloneOutcome = {
+  path: string
+  /** The folder already was a clone of this repository, so nothing was downloaded. */
+  alreadyCloned: boolean
+}
+
+export async function cloneGithubRepoOutcome(
+  url: string,
+  targetDir: string,
+): Promise<CloneOutcome> {
+  return invoke<CloneOutcome>('clone_github_repo', { url, targetDir })
+}
+
+/**
+ * Deletes a clone Arcadia manages. `not_managed` means the folder is the user's own and was left
+ * alone; rejects with `clone_has_changes` while it holds work that was not pushed.
+ */
+export async function removeManagedClone(path: string): Promise<'removed' | 'not_managed'> {
+  return invoke<'removed' | 'not_managed'>('remove_managed_clone', { path })
+}
+
 export async function cloneGithubRepo(url: string, targetDir: string): Promise<string> {
-  return invoke<string>('clone_github_repo', { url, targetDir })
+  return (await cloneGithubRepoOutcome(url, targetDir)).path
 }
 
 export type DiffSummaryEntry = { path: string; status: string }

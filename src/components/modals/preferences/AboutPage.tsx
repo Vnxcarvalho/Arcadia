@@ -1,22 +1,14 @@
 import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
 import {
-  BookOpen,
-  Bug,
   Download,
   DownloadCloud,
   ExternalLink,
   FolderOpen,
-  Github,
-  GitPullRequest,
   History,
-  Instagram,
-  Lightbulb,
-  Linkedin,
   type LucideIcon,
   RotateCcw,
   ScrollText,
   TriangleAlert,
-  Youtube,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -43,26 +35,10 @@ import { SettingsSection } from './primitives'
 
 const REPO_URL = 'https://github.com/Vnxcarvalho/Alethe-2.0'
 
-const CREATOR_LINKS: { label: string; url: string; Icon: LucideIcon }[] = [
-  { label: 'GitHub', url: 'https://github.com/Kc1t', Icon: Github },
-  { label: 'YouTube', url: 'https://www.youtube.com/@kc_1t', Icon: Youtube },
-  { label: 'Instagram', url: 'https://www.instagram.com/kc1t_dev', Icon: Instagram },
-  { label: 'LinkedIn', url: 'https://www.linkedin.com/in/kaua-miguel', Icon: Linkedin },
-]
-
 const smallButton = `${controls.btn} ${controls.btnSm}`
 
 function percentOf(downloaded: number, total: number): number {
   return total > 0 ? Math.min(100, Math.round((downloaded / total) * 100)) : 0
-}
-
-function LinkButton({ Icon, label, url }: { Icon: LucideIcon; label: string; url: string }) {
-  return (
-    <button type="button" className={smallButton} onClick={() => void openInBrowser(url)}>
-      <Icon size={13} aria-hidden="true" />
-      {label}
-    </button>
-  )
 }
 
 export function AboutPage() {
@@ -80,7 +56,6 @@ export function AboutPage() {
       <CreatorSection />
       <UpdatesSection version={version} />
       <OlderVersionsSection version={version} />
-      <ContributeSection />
       <InfoSection />
     </>
   )
@@ -146,15 +121,10 @@ function CreatorSection() {
         <div className={about.creatorCard}>
           <img src={creatorPhoto} alt="" className={about.creatorPhoto} draggable={false} />
           <div className={about.creatorCopy}>
-            <strong>Kauã Miguel</strong>
-            <span>@kc1t_dev · {t('prefs.aboutCreatorRole')}</span>
+            <strong>Alan Carvalho</strong>
+            <span>{t('prefs.aboutCreatorRole')}</span>
             <p>{t('prefs.aboutCreatorBio')}</p>
           </div>
-        </div>
-        <div className={about.linkRow}>
-          {CREATOR_LINKS.map((link) => (
-            <LinkButton key={link.label} {...link} />
-          ))}
         </div>
       </div>
     </SettingsSection>
@@ -449,40 +419,6 @@ function OlderVersionsSection({ version }: { version: string }) {
           {t('prefs.aboutOlderAll')}
           <ExternalLink size={12} aria-hidden="true" />
         </button>
-      </div>
-    </SettingsSection>
-  )
-}
-
-function ContributeSection() {
-  const t = useT()
-  return (
-    <SettingsSection
-      id="app-contribute"
-      title={t('prefs.aboutContributeTitle')}
-      description={t('prefs.aboutContributeDesc')}
-    >
-      <div className={about.linkRow}>
-        <LinkButton
-          Icon={Bug}
-          label={t('prefs.aboutReportBug')}
-          url={`${REPO_URL}/issues/new?template=bug_report.yml`}
-        />
-        <LinkButton
-          Icon={Lightbulb}
-          label={t('prefs.aboutRequestFeature')}
-          url={`${REPO_URL}/issues/new?template=feature_request.yml`}
-        />
-        <LinkButton
-          Icon={GitPullRequest}
-          label={t('prefs.aboutOpenPullRequest')}
-          url={`${REPO_URL}/compare`}
-        />
-        <LinkButton
-          Icon={BookOpen}
-          label={t('prefs.aboutContributingGuide')}
-          url={`${REPO_URL}/blob/main/CONTRIBUTING.md`}
-        />
       </div>
     </SettingsSection>
   )

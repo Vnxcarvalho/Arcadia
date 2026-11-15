@@ -772,6 +772,7 @@ export type Preferences = {
 
   accountCreated: boolean
 
+  /** Unused: Arcadia always opens on the Home. Kept so saved and synced settings still parse. */
   alwaysStartOnHome: boolean
 
   alwaysStartUnrestricted: boolean

@@ -1798,14 +1798,29 @@ export const ptBR: Record<MessageKey, string> = {
   'crud.cancel': 'Cancelar',
   'crud.create': 'Criar',
   'crud.createProjectOnly': 'Criar só o projeto',
-  'crud.createProjectAndOpenTerminal': 'Criar projeto e abrir terminal',
+  'crud.createProjectAndOpenTerminal': 'Abrir projeto',
   'crud.detectedConfigFound': 'Configuração Arcadia existente detectada para "{name}"',
   'crud.detectedConfigRestore': 'Restaurar',
   'crud.cloningRepoTitle': 'Clonando Repositório',
-  'crud.cloningRepoBody': 'Iniciando clone de {url} e gerando briefing de contexto de IA…',
+  'crud.cloningRepoBody': 'Iniciando clone de {url}…',
   'crud.repoClonedTitle': 'Repositório Clonado',
-  'crud.repoClonedBody':
-    'Clone concluído com sucesso. Contexto de IA injetado em AGENTS.md e CLAUDE.md.',
+  'crud.repoClonedBody': 'Pasta: {path}',
+  'ui.sidebar.cloneKeptTitle': 'Clone mantido',
+  'ui.sidebar.cloneKeptBody':
+    'O projeto foi excluído, mas {path} tem alterações que não foram enviadas ao GitHub, então a pasta fica.',
+  'ui.sidebar.cloneNotRemovedTitle': 'Não foi possível remover o clone',
+  'crud.repoAlreadyClonedTitle': 'Repositório já clonado',
+  'crud.cloneFolderTaken':
+    'A pasta {path} já existe, não está vazia e não é um clone deste repositório. Escolha outra pasta.',
+  'crud.cloneNoAccess':
+    'O GitHub não permitiu o clone: o repositório não existe ou você não tem acesso a ele. Use Clonar repositório para entrar com o GitHub.',
+  'crud.cloneGitMissing': 'Não foi possível iniciar o Git. Instale o Git e tente de novo.',
+  'crud.cloneFailedReason': 'Não foi possível clonar: {reason}',
+  'team.state.working': 'trabalhando',
+  'team.state.ready': 'pronto',
+  'team.state.ended': 'encerrado',
+  'team.bar': 'Time de agentes',
+  'team.agentCount': '{count} agentes',
   'crud.cloneErrorTitle': 'Erro no Clone',
   'crud.createAgentSandboxProject': 'Criar projeto Agent Sandbox',
   'crud.firstTerminalLabel': 'Primeiro terminal',
@@ -1914,6 +1929,7 @@ export const ptBR: Record<MessageKey, string> = {
     'Um líder e um terminal por papel, lado a lado. Eles se coordenam pelo TEAM.md do projeto.',
   'term.team.roles': 'Papéis (separados por vírgula)',
   'term.team.open': 'Abrir time {agent}',
+  'term.team.needsFolder': 'Escolha a pasta do projeto primeiro: o time trabalha dentro dela.',
   'term.cancel': 'Cancelar',
   'term.create': 'Criar',
   'term.type': 'Tipo',
@@ -2950,24 +2966,6 @@ export const ptBR: Record<MessageKey, string> = {
   'update.checkingAgain': 'Verificando novamente…',
   'update.retryCheck': 'Tentar novamente',
   'update.currentVersionTitle': 'Versão instalada — clique para atualizações',
-
-  'prefs.categoryTutorials': 'Tutoriais',
-  'prefs.categoryTutorialsDesc': 'Vídeos que mostram a Arcadia em uso real',
-  'tutorials.videosTitle': 'Vídeos',
-  'tutorials.videosDesc':
-    'Veja como orquestrar agentes com a Arcadia, aqui mesmo nas Preferências.',
-  'tutorials.play': 'Reproduzir {title}',
-  'tutorials.openYoutube': 'Abrir no YouTube',
-  'tutorials.channel': 'Mais no canal do YouTube',
-  'tutorials.embedHint': 'Se um vídeo não tocar aqui, abra no YouTube.',
-  'tutorials.language.pt-BR': 'Português',
-  'tutorials.language.en': 'Inglês',
-  'tutorials.summaryOrchestrate':
-    'Uma introdução prática a coordenar vários agentes de código ao mesmo tempo, em vez de trabalhar com um por vez.',
-  'tutorials.summarySkill':
-    'Um tutorial de como orquestrar agentes de código com a skill gratuita Alethe Orchestrate.',
-  'tutorials.summaryDevlog':
-    'Um dia real de desenvolvimento com a Arcadia no fluxo de trabalho do dia a dia.',
   'prefs.categoryAbout': 'Sobre & atualizações',
   'prefs.categoryAboutDesc': 'Versão, atualizações, versões anteriores e quem faz o Arcadia.',
   'prefs.aboutVersionTitle': 'Versão',
@@ -2981,10 +2979,10 @@ export const ptBR: Record<MessageKey, string> = {
   'prefs.aboutWhatsNew': 'Novidades',
   'prefs.aboutCreatorTitle': 'Feito por',
   'prefs.aboutCreatorDesc': 'O Arcadia é desenhado, construído e mantido por um desenvolvedor.',
-  'prefs.aboutCreatorPhotoAlt': 'Kauã Miguel',
+  'prefs.aboutCreatorPhotoAlt': 'Alan Carvalho',
   'prefs.aboutCreatorRole': 'Criador e mantenedor',
   'prefs.aboutCreatorBio':
-    'Constrói o Arcadia em público. Acompanhe para ver as novas versões e vídeos sobre agentes de código.',
+    'Constrói e mantém o Arcadia, para quem trabalha com agentes de código.',
   'prefs.aboutOlderTitle': 'Versões anteriores',
   'prefs.aboutOlderDesc': 'Volte para uma versão anterior se uma mais nova atrapalhar.',
   'prefs.aboutOlderShow': 'Mostrar versões anteriores',
@@ -3006,13 +3004,6 @@ export const ptBR: Record<MessageKey, string> = {
   'prefs.aboutOlderNotInstallable':
     'A v{version} não pode ser instalada por aqui. Baixe o instalador no GitHub.',
   'prefs.aboutOlderAll': 'Todas as versões no GitHub',
-  'prefs.aboutContributeTitle': 'Contribuir',
-  'prefs.aboutContributeDesc':
-    'O Arcadia é open source sob AGPL-3.0. Relate o que quebrou, sugira o que falta ou envie uma mudança.',
-  'prefs.aboutReportBug': 'Relatar um bug',
-  'prefs.aboutRequestFeature': 'Sugerir um recurso',
-  'prefs.aboutOpenPullRequest': 'Abrir um pull request',
-  'prefs.aboutContributingGuide': 'Guia de contribuição',
   'prefs.aboutInfoTitle': 'Informações',
   'prefs.aboutInfoDesc':
     'Licença, privacidade, código-fonte e onde o Arcadia guarda seus arquivos.',

@@ -1,0 +1,41 @@
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  font: 500 10px var(--font-mono);
+  color: var(--fg-faint);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg-faint);
+}
+
+.state[data-state='working'] {
+  color: var(--status-working);
+}
+
+.state[data-state='working'] .dot {
+  background: var(--status-working);
+  animation: pulse 1.1s ease-in-out infinite;
+}
+
+.state[data-state='ended'] .dot {
+  background: var(--status-offline);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state[data-state='working'] .dot {
+    animation: none;
+  }
+}

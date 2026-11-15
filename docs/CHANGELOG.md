@@ -11,6 +11,52 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 ## [Unreleased]
 
 ### Added
+- **An Antigravity team looks like a tmux session.** Each pane of the team is numbered and named
+  (`1 · lead`, `2 · front`, `3 · back`), has its own colour on the border and the title, and shows
+  what the agent is doing (working, ready, ended). Under the team there is a status line with the
+  project name, the number of agents, the members as windows (`1:lead* 2:front 3:back`, the focused one
+  starred and clickable) and the time.
+- **Antigravity's prompt for the team helper is accepted for you.** When a team lead runs
+  `alethe-team open` or `alethe-team send`, Antigravity asked "Run this command?" every time, and on
+  Windows its saved rules only match an identical command, so each new role or task asked again.
+  With Agent teams on, Arcadia now confirms that prompt, and only for those two commands with plain
+  text after them. Any other command, and any command that chains something else (`;`, `&`, `|`,
+  quotes, `# Changelog
+
+Notable user-facing changes to **Arcadia** are documented here. The format is based on
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows
+[Semantic Versioning](https://semver.org/). Dates use UTC.
+
+> **Rule:** every feature addition, change, or removal must be recorded under
+> `[Unreleased]` in the same task. During a release, `[Unreleased]` becomes the new
+> dated version and a new empty `[Unreleased]` section is added at the top.
+
+## [Unreleased]
+
+), still waits for you.
+- **Removed the Tutorials tab and the "Contribute" section of About.** The tab (videos from the
+  creator's channel) and the section with the bug report, feature request, pull request and
+  contributing guide buttons are gone from Preferences.
+- **The "Made by" card in About now shows Alan Carvalho**, without the social media handle and the
+  GitHub, YouTube, Instagram and LinkedIn buttons.
+- **A new terminal in another project opens that project on its own.** Creating a terminal (or a team)
+  in a project that was not on screen used to squeeze that project into the view of the project you
+  were looking at. Now it opens in its own tab, so each project shows only its own terminals.
+- **A project made from a GitHub link now works in its clone, without you choosing a folder.** Before,
+  the clone was made but the project never pointed at it, so its terminals and agent teams opened in
+  your user folder. With no folder chosen, Arcadia now clones a shallow copy (current files only, little
+  disk space) into its own folder and the project uses it. Deleting the project removes that copy, unless
+  it holds changes that were not pushed to GitHub: then the folder stays and Arcadia says so.
+- **Antigravity teams finish small tasks much faster.** A team opened without a project folder started  in the user's home folder, so the agents searched the disk for the project and edited several copies  of the same file (a colour change took 4 to 5 minutes). A team now needs a project folder, its prompts  name that folder, and they tell the agents to skip exploring, edit directly and write one line in  TEAM.md.
+- **Antigravity team commands now work from Antigravity's sandbox.** Antigravity runs shell commands
+  in a sandbox that blocks the local connection, so `alethe-team open` and `alethe-team send` failed
+  with "os error 10013" and the lead could not open its members. When the connection is blocked, the
+  command now leaves its request in the temp folder and Arcadia picks it up from there.
+- **A team lead can give tasks to its members after the first one.** In an Antigravity team the lead now
+  has `alethe-team send ROLE TASK`: Arcadia types the task into that member's terminal and presses
+  Enter, so the member starts at once, for as many tasks as the user gives. Before, only the first task
+  reached the members; later ones written in `TEAM.md` were never picked up, because the agents do not
+  watch the file. The lead and the members are told how to use it in their first prompt.
 - **Clone your GitHub repositories from Arcadia.** The Home has a "clone repository" button, and New
   project has "Clone repository"; both sign you in
   with GitHub (a code you confirm in the browser) and lists your repositories, including private and
@@ -453,8 +499,14 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
   installer instead.
 
 ### Changed
+- **The empty workspace shows the Arcadia bust.** The screen with "New terminal" and "Add content",
+  seen before any terminal is open, drew the old Alethe mark; it now draws the pixel-art bust with the
+  red blindfold, faint behind the shortcuts. The dots follow the text colour and the blindfold the
+  error colour of the theme.
+- **Arcadia opens on the Home.** The first screen is the Home, no longer the projects view. The
+  "always start on the Home" setting that nothing in the app could change is ignored.
 - **"Create project" is now "Open project".** The buttons in the empty Home, the empty sidebar and the
-  empty workspace use the new name. The Home terminal title reads `arcadia@workspace:~`, and the
+  empty workspace, and the confirm button of the New project window, use the new name. The Home terminal title reads `arcadia@workspace:~`, and the
   version card in Preferences → About shows the Arcadia logo instead of the old Alethe mark.
 - **The Arcadia logo is the pixel-art bust with the red blindfold.** It is the default app icon and
   profile picture and replaces the Elite artwork
@@ -607,6 +659,30 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 
 ### Fixed
 
+- **A new terminal gets the keyboard right away.** After opening a terminal from New terminal or New
+  agent, the first keys, such as Tab on a permission prompt, went nowhere until you clicked the
+  terminal: the window gave the keyboard back to the button that opened it. The new terminal (the
+  lead, for a team) now takes it, and the window no longer takes it back. The same holds for the
+  terminals opened from Recent chats and from an empty workspace.
+- **Cloning a repository that is already cloned no longer fails.** When the folder already is a clone of
+  that repository, Arcadia says "Repository already cloned" and uses the folder. If the folder exists,
+  is not empty and is something else, it says so, in your language, and asks for another folder.
+  Clone errors are now one readable sentence (no access, git missing, git's own message) instead of
+  a cut-off Portuguese line starting with the repository address.
+- **The clone notifications are neutral.** "Cloning repository", "Repository cloned" and the clone error
+  showed the Claude mascot, as if Claude had done the work. They now use a plain icon for each state
+  (a download arrow, a green check, a red warning), in the pop-up and in the Home list. The "cloned"
+  message names the folder, and no longer talks about AI context files.
+- **The terminals no longer lose their colours when Arcadia is launched from a Claude Code session.** An
+  installer or script run by an agent handed `NO_COLOR` and the `CLAUDE_CODE_*` variables (one holds a
+  session token) to Arcadia and, through it, to every terminal: Claude Code and Antigravity then
+  drew in plain white, and `claude` believed it ran inside another session. Arcadia now drops them
+  from the terminals it opens when it sees a Claude Code session started it; a `NO_COLOR` you set
+  yourself is kept.
+- **The Home no longer overlaps in short or narrow windows.** The date and the "new terminal", "new
+  project" and "clone repository" buttons drew over the divider of the section below; the top area now
+  keeps the height of its content and the page scrolls instead. The artwork also keeps a minimum
+  width, so the greeting no longer lands on the face when the window is narrow.
 - **The GitHub repository list no longer asks GitHub again and again.** Opening it repeated the
   request after every redraw, which used up the hourly API limit of your account and left the list
   loading forever. It now asks once.

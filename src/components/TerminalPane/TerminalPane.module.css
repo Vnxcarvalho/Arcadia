@@ -46,6 +46,21 @@
    CONTAINER's OWN ring is the only focus indicator, always — no exception
    for pane count. Resets the pane's border/box-shadow so it never competes
    with it, whether it has siblings or not. */
+.paneTeam {
+  border-color: color-mix(in srgb, var(--team-color) 50%, var(--border));
+}
+
+.paneTeam:focus-within:not(.paneFocus) {
+  border-color: var(--team-color);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--team-color) 70%, transparent);
+}
+
+.teamTag {
+  color: var(--team-color);
+  font: 700 12px var(--font-mono);
+  white-space: nowrap;
+}
+
 :global(.rainbow-container-border) .pane:focus-within:not(.paneFocus) {
   border-color: var(--border);
   box-shadow: none;

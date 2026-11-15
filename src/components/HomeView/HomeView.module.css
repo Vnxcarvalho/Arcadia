@@ -943,6 +943,16 @@
   background: var(--bg-elevated);
   border-color: var(--border);
 }
+.notifSuccess {
+  color: var(--status-working);
+  background: color-mix(in srgb, var(--status-working) 14%, transparent);
+  border-color: color-mix(in srgb, var(--status-working) 26%, transparent);
+}
+.notifError {
+  color: var(--status-offline);
+  background: color-mix(in srgb, var(--status-offline) 14%, transparent);
+  border-color: color-mix(in srgb, var(--status-offline) 26%, transparent);
+}
 .notifClaude {
   color: var(--agent-claude);
   background: color-mix(in srgb, var(--agent-claude) 14%, transparent);
@@ -2031,10 +2041,15 @@
   );
 }
 
+/* The artwork keeps at least this width in narrow windows and is cropped at the sides, so the
+   face stays below the greeting instead of rising into it as the window shrinks. */
 .homeBackdropImage {
   display: block;
-  width: 100%;
+  width: max(100%, 1000px);
+  max-width: none;
   height: 100%;
+  margin-left: 50%;
+  transform: translateX(-50%);
   padding-top: var(--bg-drop);
   box-sizing: border-box;
   object-fit: contain;
@@ -2083,6 +2098,9 @@
   --hero-lift: 35px;
   --hero-drop: 175px;
   position: relative;
+  /* A flex item with an explicit min-height may shrink below its content inside the page; without
+     this the date and the buttons spill over the sections below in short or narrow windows. */
+  flex-shrink: 0;
   min-height: calc(clamp(430px, 56vh, 610px) + var(--hero-drop) - var(--hero-lift));
   display: flex;
   flex-direction: column;

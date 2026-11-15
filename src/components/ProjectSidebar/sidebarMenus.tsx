@@ -30,6 +30,7 @@ import {
   openInFileExplorer,
   openInVscode,
   readTextFile,
+  removeManagedClone,
   writeTextFile,
 } from '../../lib/tauri'
 import type { Group, Project, Terminal } from '../../lib/types'
@@ -331,6 +332,17 @@ export function createSidebarMenus(deps: SidebarMenuDeps) {
           )
         ) {
           actions.deleteProject(project.id)
+          if (project.githubUrl && project.defaultCwd) {
+            const folder = project.defaultCwd
+            void removeManagedClone(folder).catch((error) => {
+              const kept = String(error).includes('clone_has_changes')
+              useUiStore.getState().pushToast({
+                title: t(kept ? 'ui.sidebar.cloneKeptTitle' : 'ui.sidebar.cloneNotRemovedTitle'),
+                body: kept ? t('ui.sidebar.cloneKeptBody', { path: folder }) : String(error),
+                kind: 'error',
+              })
+            })
+          }
         }
       },
     },

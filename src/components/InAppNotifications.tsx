@@ -3,10 +3,12 @@ import { type CSSProperties, useEffect } from 'react'
 
 import { agentAccentVar } from '../lib/agentProviders'
 import { useT } from '../lib/i18n'
+import { toastKindAccent } from '../lib/toastKind'
 import { useProjectsStore } from '../stores/projectsStore'
 import { type InAppToast, useUiStore } from '../stores/uiStore'
 import { AgentIcon } from './icons/AgentIcons'
 import styles from './InAppNotifications.module.css'
+import { ToastKindIcon } from './ToastKindIcon'
 
 function ToastItem({ toast }: { toast: InAppToast }) {
   const t = useT()
@@ -23,7 +25,9 @@ function ToastItem({ toast }: { toast: InAppToast }) {
   }, [dismissToast, toast.id, toast.actions])
 
   const accentStyle = {
-    '--toast-accent': toast.agent ? agentAccentVar(toast.agent) : 'var(--accent)',
+    '--toast-accent': toast.agent
+      ? agentAccentVar(toast.agent)
+      : toastKindAccent(toast.kind ?? 'progress'),
   } as CSSProperties
 
   return (
@@ -31,6 +35,8 @@ function ToastItem({ toast }: { toast: InAppToast }) {
       <div className={styles.toastIcon} aria-hidden>
         {toast.agent ? (
           <AgentIcon type={toast.agent} size={16} theme={uiTheme} />
+        ) : toast.kind ? (
+          <ToastKindIcon kind={toast.kind} />
         ) : (
           <Bell size={14} />
         )}

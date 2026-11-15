@@ -1,8 +1,10 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { type ReactNode, useRef } from 'react'
 
+import { terminalFocusWasJustRequested } from '../../lib/focusRequest'
 import { useT } from '../../lib/i18n'
+import { useUiStore } from '../../stores/uiStore'
 import styles from './Modal.module.css'
 
 type Props = {
@@ -31,6 +33,10 @@ export function Modal({
   headerAction,
 }: Props) {
   const t = useT()
+  // Read when the window closes, which is after the terminal it opened asked for the keyboard.
+  const focusRequest = useUiStore((s) => s.focusRequest)
+  const focusRequestRef = useRef(focusRequest)
+  focusRequestRef.current = focusRequest
   return (
     <Dialog.Root open={open} onOpenChange={(v) => !v && open && onClose()}>
       <Dialog.Portal>
@@ -46,6 +52,13 @@ export function Modal({
           }}
           onEscapeKeyDown={(event) => {
             if (document.querySelector('[data-alethe-dropdown-menu]')) event.preventDefault()
+          }}
+          onCloseAutoFocus={(event) => {
+            // A terminal opened by this window asked for the keyboard; giving it back to the button that
+            // opened the window would leave the first keys, such as Tab, going nowhere.
+            if (terminalFocusWasJustRequested(focusRequestRef.current ?? null)) {
+              event.preventDefault()
+            }
           }}
           onOpenAutoFocus={(e) => {
             const root = e.currentTarget as HTMLElement | null

@@ -16,7 +16,8 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { type CSSProperties, memo, useEffect, useMemo, useRef, useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 
 import { relaunchAgentPty } from '../../lib/agentRelaunch'
 import { graphifyRepoOf } from '../../lib/claudeMcpConfigs'
@@ -37,6 +38,7 @@ import {
   getPtyCwd,
   openInVscode,
 } from '../../lib/tauri'
+import { teamMemberOf } from '../../lib/teamView'
 import {
   type AgentType,
   isShellAgentType,
@@ -50,6 +52,7 @@ import { useUiStore } from '../../stores/uiStore'
 import { GhosttySurface } from '../GhosttySurface'
 import { AgentIcon, VSCodeIcon } from '../icons/AgentIcons'
 import { SubTabsLane } from '../SubTabsLane'
+import { TeamMemberState } from '../TeamMemberState'
 import { XTermView } from '../XTermView'
 import styles from './TerminalPane.module.css'
 import { WslBadge } from './WslBadge'
@@ -424,6 +427,14 @@ export const TerminalPane = memo(function TerminalPane({
 
   const cancelRename = () => setIsRenaming(false)
 
+  // In an Antigravity team the pane is drawn like a tmux pane: numbered, named and coloured.
+  const teamMember = useProjectsStore(
+    useShallow((s) => {
+      const owner = s.projects.find((candidate) => candidate.id === projectId)
+      return owner ? teamMemberOf(owner.terminals, terminal.id) : null
+    }),
+  )
+
   const dropTarget = canDragPane && droppable.isOver
   const dragging = canDragPane && draggable.isDragging
 
@@ -448,7 +459,10 @@ export const TerminalPane = memo(function TerminalPane({
           }
         }
       }}
-      className={`${styles.pane} ${isFocusMode ? styles.paneFocus : ''} ${terminal.disabled ? styles.disabled : ''} ${dragging ? styles.dragging : ''} ${dropTarget ? styles.dropTarget : ''}`}
+      className={`${styles.pane} ${teamMember ? styles.paneTeam : ''} ${isFocusMode ? styles.paneFocus : ''} ${terminal.disabled ? styles.disabled : ''} ${dragging ? styles.dragging : ''} ${dropTarget ? styles.dropTarget : ''}`}
+      style={
+        teamMember ? ({ ['--team-color' as string]: teamMember.color } as CSSProperties) : undefined
+      }
     >
       <header
         className={`${styles.header} ${topbarPinned ? styles.headerPinned : ''} ${effectiveLaneVisible ? styles.headerWithLane : ''}`}
@@ -499,6 +513,17 @@ export const TerminalPane = memo(function TerminalPane({
                         }
                       }}
                     />
+                  ) : teamMember ? (
+                    <span
+                      className={styles.teamTag}
+                      title={teamMember.name}
+                      onDoubleClick={(event) => {
+                        event.stopPropagation()
+                        startRename()
+                      }}
+                    >
+                      {teamMember.index} · {teamMember.name}
+                    </span>
                   ) : (
                     <span
                       className={styles.name}
@@ -512,6 +537,7 @@ export const TerminalPane = memo(function TerminalPane({
                     </span>
                   )}
                   <WslBadge cwd={cwd} />
+                  {teamMember ? <TeamMemberState ptyId={activeTab?.ptyId ?? null} /> : null}
                 </div>
               </>
             ) : null}

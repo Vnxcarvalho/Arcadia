@@ -113,6 +113,7 @@ export function NewTerminalModal() {
     'shell'
   const selectedAgent = allAgents.find((agent) => agent.type === type) ?? allAgents[0]
   const inheritedCwd = useMemo(() => getProjectDefaultCwd(project, projects), [project, projects])
+  const teamHasFolder = Boolean((cwd || inheritedCwd).trim())
   const recentFolders = useMemo(() => {
     const folders = new Map<string, { path: string; lastUsedAt: number }>()
     for (const candidate of projects) {
@@ -214,9 +215,15 @@ export function NewTerminalModal() {
     const trimmedGoal = goal.trim()
     if (opensTeam) {
       if (roles.length === 0) return
-      await createAntigravityTeam({ projectId: context.projectId, cwd: finalCwd, roles, extraArgs })
+      const leadId = await createAntigravityTeam({
+        projectId: context.projectId,
+        cwd: finalCwd,
+        roles,
+        extraArgs,
+      })
       reset()
       closeModal()
+      useUiStore.getState().requestPaneFocus(leadId)
       return
     }
     const creation = {
@@ -247,6 +254,8 @@ export function NewTerminalModal() {
     if (createMore && !orchestrating) return
     reset()
     closeModal()
+    // The new terminal gets the keyboard, so the first key (Tab for a permission prompt) reaches it.
+    useUiStore.getState().requestPaneFocus(terminal.id)
   }
 
   const wslTarget = wslTargetFor(cwd || inheritedCwd, wslEnabled)
@@ -348,7 +357,10 @@ export function NewTerminalModal() {
             type="button"
             className={`${controls.btn} ${controls.btnPrimary} ${styles.submitButton}`}
             onClick={() => void submit()}
-            disabled={!context?.projectId || (opensTeam && roles.length === 0)}
+            disabled={
+              !context?.projectId || (opensTeam && (roles.length === 0 || !teamHasFolder))
+            }
+            title={opensTeam && !teamHasFolder ? t('term.team.needsFolder') : undefined}
           >
             {orchestrating
               ? t('term.createOrchestration')

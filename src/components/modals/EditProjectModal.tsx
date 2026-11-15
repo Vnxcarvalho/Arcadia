@@ -1,6 +1,7 @@
 import { Bot, FolderSearch, GitBranch, GitMerge, Palette, Plug } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
+import { describeCloneError } from '../../lib/cloneError'
 import { pickDirectory } from '../../lib/dialog'
 import { useT } from '../../lib/i18n'
 import {
@@ -305,7 +306,7 @@ export function EditProjectModal() {
     try {
       relocateProject(project.id, await cloneGithubRepo(project.githubUrl, parent))
     } catch (err) {
-      setRelocateError(t('projectSync.cloneError', { error: String(err) }))
+      setRelocateError(t('projectSync.cloneError', { error: describeCloneError(err, t) }))
     } finally {
       setRelocating(false)
     }

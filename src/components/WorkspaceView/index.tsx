@@ -944,6 +944,7 @@ function NoWorkspace({
         firstTab: { type: quickAgent, cwd, runtimeProfile: 'lean' },
       })
       openTerminalWorkspace(project.id, terminal.id)
+      useUiStore.getState().requestPaneFocus(terminal.id)
       return
     }
     const createdProject = createProject({ name, defaultCwd: cwd })
@@ -954,6 +955,7 @@ function NoWorkspace({
       firstTab: { type: quickAgent, cwd, runtimeProfile: 'lean' },
     })
     openTerminalWorkspace(createdProject.id, terminal.id)
+    useUiStore.getState().requestPaneFocus(terminal.id)
   }
   if (group) {
     const projectIds = collectGroupProjectIds(group.id, allGroups)

@@ -92,6 +92,7 @@ import type { AgentHookPayload } from '../../stores/agentCanvasStore'
 import { useProjectsStore } from '../../stores/projectsStore'
 import { useTerminalsStore } from '../../stores/terminalsStore'
 import { useUiStore } from '../../stores/uiStore'
+import { AntigravityTeamApproval } from './antigravityTeamApproval'
 import { keepTerminalTextareaClean } from './terminalComposition'
 import {
   loadTerminalFonts,
@@ -397,6 +398,27 @@ export function useXtermSession(params: {
       ? keepTerminalTextareaClean(terminal.textarea)
       : () => {}
     terminalRef.current = terminal
+    // With Agent teams on, an Antigravity terminal accepts its own permission prompt for the team
+    // helper (`alethe-team open|send`), and for nothing else.
+    const teamApproval =
+      command === 'antigravity' && preferences.enabledFeatures.agentTeams && !readOnly
+        ? new AntigravityTeamApproval({
+            readScreen: () => {
+              const buffer = terminal.buffer.active
+              const start = Math.max(0, buffer.length - terminal.rows)
+              const lines: string[] = []
+              for (let y = start; y < buffer.length; y++) {
+                const line = buffer.getLine(y)
+                if (line) lines.push(line.translateToString(true))
+              }
+              return lines.join('\n')
+            },
+            confirm: () => {
+              const id = ptyIdRef.current
+              return id ? writePty(id, '\r') : Promise.resolve()
+            },
+          })
+        : null
     const clampHorizontalScroll = () => {
       container.scrollLeft = 0
       const xterm = container.querySelector<HTMLElement>('.xterm')
@@ -951,6 +973,7 @@ export function useXtermSession(params: {
         if (heldLiveOutput) heldLiveOutput.push(chunk)
         else queueTerminalWrite(chunk)
         completionMonitor?.handleOutput(chunk)
+        teamApproval?.handleOutput()
         inspectChunk?.(chunk)
       })
       if (disposed) {
@@ -962,6 +985,7 @@ export function useXtermSession(params: {
       const activityUnlisten = await listenPtyActivity(id, (chunk) => {
         useTerminalsStore.getState().recordIo(id)
         completionMonitor?.handleOutput(chunk)
+        teamApproval?.handleOutput()
         inspectChunk?.(chunk)
       })
       if (disposed) {
@@ -1840,6 +1864,7 @@ export function useXtermSession(params: {
       linkScrollDisposable?.dispose()
       completionMonitor?.dispose()
       completionMonitor = null
+      teamApproval?.dispose()
       setLinkActions(null)
       if (terminalRef.current === terminal) terminalRef.current = null
       ptyIdRef.current = null

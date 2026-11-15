@@ -6,7 +6,6 @@ import {
   ChevronRight,
   Info,
   type LucideIcon,
-  MonitorPlay,
   Palette,
   Plug,
   Puzzle,
@@ -40,7 +39,6 @@ import { PluginsPage } from './preferences/PluginsPage'
 import { Avatar } from './preferences/primitives'
 import { RemoteControlPage } from './preferences/RemoteControlPage'
 import { TerminalPage } from './preferences/TerminalPage'
-import { TutorialsPage } from './preferences/TutorialsPage'
 import styles from './PreferencesModal.module.css'
 
 type CategoryId =
@@ -54,7 +52,6 @@ type CategoryId =
   | 'orchestration'
   | 'playbooks'
   | 'organization'
-  | 'tutorials'
   | 'about'
   | 'remoteControl'
 
@@ -155,12 +152,6 @@ export function PreferencesModal() {
         label: t('prefs.categoryMultiagent'),
         description: t('prefs.categoryMultiagentDesc'),
         Icon: Activity,
-      },
-      {
-        id: 'tutorials',
-        label: t('prefs.categoryTutorials'),
-        description: t('prefs.categoryTutorialsDesc'),
-        Icon: MonitorPlay,
       },
       {
         id: 'about',
@@ -396,14 +387,6 @@ export function PreferencesModal() {
         keywords: section.keywords ?? '',
       })),
       {
-        category: 'tutorials',
-        target: 'tutorials-videos',
-        label: t('tutorials.videosTitle'),
-        description: t('tutorials.videosDesc'),
-        keywords:
-          'tutorial tutorials video videos youtube learn guide help aprender ajuda guia vídeo 教程 视频 帮助',
-      },
-      {
         category: 'about',
         target: 'app-version',
         label: t('prefs.aboutVersionTitle'),
@@ -422,7 +405,7 @@ export function PreferencesModal() {
         target: 'app-creator',
         label: t('prefs.aboutCreatorTitle'),
         description: t('prefs.aboutCreatorDesc'),
-        keywords: 'creator author owner maintainer kc1t kaua miguel criador autor dono 作者 维护者',
+        keywords: 'creator author owner maintainer alan carvalho criador autor dono 作者 维护者',
       },
       {
         category: 'about',
@@ -431,14 +414,6 @@ export function PreferencesModal() {
         description: t('prefs.aboutOlderDesc'),
         keywords:
           'downgrade older previous version rollback release versão anterior antiga voltar 降级 旧版本 回滚',
-      },
-      {
-        category: 'about',
-        target: 'app-contribute',
-        label: t('prefs.aboutContributeTitle'),
-        description: t('prefs.aboutContributeDesc'),
-        keywords:
-          'contribute pull request pr issue bug feature github open source contribuir relatar 贡献 问题 拉取请求',
       },
       {
         category: 'about',
@@ -666,7 +641,6 @@ export function PreferencesModal() {
                   ) : null}
                   {category === 'playbooks' ? <PlaybooksPage /> : null}
                   {category === 'organization' ? <OrganizationPage /> : null}
-                  {category === 'tutorials' ? <TutorialsPage /> : null}
                   {category === 'about' ? <AboutPage /> : null}
                   {category === 'remoteControl' ? <RemoteControlPage /> : null}
                 </ErrorBoundary>
