@@ -1459,6 +1459,8 @@ export const en = {
     'Alethe is now Arcadia: a new name, a new logo and new installer artwork. Your projects, profiles and settings stay where they are.',
   'whatsNew.v177.note2':
     'The Arcadia logo is now the default app icon and profile picture. The Elite artwork icons are gone; the Elite colour themes stay.',
+  'whatsNew.v1716.note1':
+    'GitHub sign-in is authorized on the GitHub website: Open GitHub opens github.com with the code already filled in, so you only confirm your account and press Authorize.',
   'whatsNew.v1715.note1':
     'First-run setup now uses your GitHub account: signing in fills your name and picture instead of asking you to type your username.',
   'whatsNew.v1715.note2':

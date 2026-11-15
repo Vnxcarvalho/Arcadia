@@ -1486,6 +1486,8 @@ export const ptBR: Record<MessageKey, string> = {
     'O Alethe agora é Arcadia: novo nome, nova logo e nova arte do instalador. Seus projetos, perfis e configurações continuam onde estão.',
   'whatsNew.v177.note2':
     'A logo do Arcadia agora é o ícone do app e a foto de perfil padrão. Os ícones da arte Elite foram removidos; os temas de cores Elite continuam.',
+  'whatsNew.v1716.note1':
+    'O login do GitHub é autorizado no site do GitHub: Abrir GitHub abre o github.com com o código já preenchido, e você só confirma a conta e clica em Autorizar.',
   'whatsNew.v1715.note1':
     'A configuração inicial agora usa sua conta do GitHub: ao entrar, seu nome e sua foto são preenchidos em vez de pedir que você digite o usuário.',
   'whatsNew.v1715.note2':
