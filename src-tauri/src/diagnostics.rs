@@ -88,6 +88,33 @@ pub fn open_in_vscode(path: String) -> Result<(), String> {
     result.map(|_| ()).map_err(|e| e.to_string())
 }
 
+/// Opens a URL or path with the program Windows has registered for it. `ShellExecuteW` reports
+/// failure (no default browser, a blocked launcher), which spawning `rundll32` never did, so the
+/// caller can say the page did not open. Explorer is the fallback when the verb is refused.
+#[cfg(target_os = "windows")]
+fn shell_open_windows(target: &str) -> std::io::Result<()> {
+    use windows_sys::Win32::UI::Shell::ShellExecuteW;
+    use windows_sys::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
+
+    let wide = |text: &str| -> Vec<u16> { text.encode_utf16().chain(std::iter::once(0)).collect() };
+    let verb = wide("open");
+    let file = wide(target);
+    let code = unsafe {
+        ShellExecuteW(
+            std::ptr::null_mut(),
+            verb.as_ptr(),
+            file.as_ptr(),
+            std::ptr::null(),
+            std::ptr::null(),
+            SW_SHOWNORMAL,
+        )
+    } as isize;
+    if code > 32 {
+        return Ok(());
+    }
+    Command::new("explorer").arg(target).spawn().map(|_| ())
+}
+
 #[tauri::command]
 pub fn open_in_browser(target: String) -> Result<(), String> {
     let trimmed = target.trim();
@@ -106,10 +133,7 @@ pub fn open_in_browser(target: String) -> Result<(), String> {
     };
 
     #[cfg(target_os = "windows")]
-    let result = Command::new("rundll32")
-        .arg("url.dll,FileProtocolHandler")
-        .arg(open_target)
-        .spawn();
+    let result = shell_open_windows(&open_target);
 
     #[cfg(target_os = "macos")]
     let result = Command::new("open").arg(open_target).spawn();

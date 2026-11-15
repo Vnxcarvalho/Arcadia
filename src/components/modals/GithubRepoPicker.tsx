@@ -40,6 +40,7 @@ export function GithubRepoPicker({ onPick }: { onPick: (repo: GithubRepo) => voi
   const [query, setQuery] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [openFailed, setOpenFailed] = useState(false)
 
   const loadRepos = useCallback(async () => {
     setError(null)
@@ -75,7 +76,8 @@ export function GithubRepoPicker({ onPick }: { onPick: (repo: GithubRepo) => voi
     try {
       const start = await githubAccountDeviceStart()
       setDevice(start)
-      void openInBrowser(start.verification_uri)
+      setOpenFailed(false)
+      openInBrowser(start.verification_uri).catch(() => setOpenFailed(true))
       const next = await githubAccountDeviceFinish(start)
       setStatus(next)
       if (next.connected) void loadRepos()
@@ -115,10 +117,14 @@ export function GithubRepoPicker({ onPick }: { onPick: (repo: GithubRepo) => voi
             <button
               type="button"
               className={styles.link}
-              onClick={() => void openInBrowser(device.verification_uri)}
+              onClick={() =>
+                openInBrowser(device.verification_uri).catch(() => setOpenFailed(true))
+              }
             >
               {t('githubAccount.openGithub')}
             </button>
+            <span className={styles.address}>{device.verification_uri}</span>
+            {openFailed ? <p className={styles.error}>{t('githubAccount.openFailed')}</p> : null}
           </div>
         ) : (
           <button

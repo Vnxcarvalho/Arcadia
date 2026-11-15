@@ -34,6 +34,12 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 ## [Unreleased]
 
 ), still waits for you.
+- **Signing in with GitHub in the first-run setup fills your profile.** "Use my GitHub account" now
+  signs in through GitHub and uses its name and picture, instead of asking you to type your username.
+  The same sign-in also lets you clone your repositories later.
+- **The GitHub sign-in page opens, or tells you why it did not.** The code screen now shows the address
+  (`github.com/login/device`) so you can open it yourself, and says when the browser could not be
+  opened. On Windows, links are opened through the system's own handler, which reports a failure.
 - **Removed the Tutorials tab and the "Contribute" section of About.** The tab (videos from the
   creator's channel) and the section with the bug report, feature request, pull request and
   contributing guide buttons are gone from Preferences.

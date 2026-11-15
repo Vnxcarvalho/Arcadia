@@ -39,6 +39,13 @@
   user-select: all;
 }
 
+.address {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  user-select: all;
+}
+
 .link {
   align-self: center;
   padding: 0;

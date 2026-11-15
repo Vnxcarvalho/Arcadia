@@ -48,7 +48,7 @@ export const ptBR: Record<MessageKey, string> = {
   'onboarding.photoChange': 'trocar',
   'onboarding.photoHint': 'Clique no avatar para escolher uma foto.',
   'onboarding.orImportFrom': 'ou importe de',
-  'onboarding.githubImport': 'Usar meu avatar do GitHub',
+  'onboarding.githubImport': 'Usar minha conta do GitHub',
   'onboarding.githubHandlePlaceholder': 'usuário do GitHub',
   'onboarding.githubUse': 'Usar',
   'onboarding.githubSignIn': 'Entrar com GitHub — opcional',
@@ -2813,6 +2813,8 @@ export const ptBR: Record<MessageKey, string> = {
   'githubAccount.waiting': 'Aguardando o GitHub…',
   'githubAccount.codeHint': 'Digite este código no GitHub:',
   'githubAccount.openGithub': 'Abrir o GitHub',
+  'githubAccount.openFailed':
+    'Não foi possível abrir o navegador. Acesse o endereço acima e digite o código.',
   'githubAccount.signedInAs': 'Conectado como {login}',
   'githubAccount.signOut': 'Sair',
   'githubAccount.search': 'Buscar nos seus repositórios',

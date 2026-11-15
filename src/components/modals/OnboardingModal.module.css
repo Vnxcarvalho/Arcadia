@@ -346,6 +346,13 @@
   color: var(--fg-faint);
 }
 
+.deviceAddress {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
+  user-select: all;
+}
+
 .deviceLink {
   border: none;
   background: none;

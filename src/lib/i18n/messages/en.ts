@@ -46,7 +46,7 @@ export const en = {
   'onboarding.photoChange': 'change',
   'onboarding.photoHint': 'Click the avatar to choose a photo.',
   'onboarding.orImportFrom': 'or import from',
-  'onboarding.githubImport': 'Use my GitHub avatar',
+  'onboarding.githubImport': 'Use my GitHub account',
   'onboarding.githubHandlePlaceholder': 'GitHub username',
   'onboarding.githubUse': 'Use',
   'onboarding.githubSignIn': 'Sign in with GitHub — optional',
@@ -2779,6 +2779,8 @@ export const en = {
   'githubAccount.waiting': 'Waiting for GitHub…',
   'githubAccount.codeHint': 'Enter this code on GitHub:',
   'githubAccount.openGithub': 'Open GitHub',
+  'githubAccount.openFailed':
+    'Could not open the browser. Go to the address above and enter the code.',
   'githubAccount.signedInAs': 'Signed in as {login}',
   'githubAccount.signOut': 'Sign out',
   'githubAccount.search': 'Search your repositories',

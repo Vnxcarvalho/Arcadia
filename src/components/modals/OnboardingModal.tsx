@@ -17,6 +17,11 @@ import {
   cloudSyncDeviceStart,
   cloudSyncStatus,
   findCliLauncher,
+  githubAccountDeviceFinish,
+  githubAccountDeviceStart,
+  type GithubAccountStatus,
+  githubAccountStatus,
+  type GithubDeviceStart,
   openInBrowser,
 } from '../../lib/tauri'
 import { getThemeIcon } from '../../lib/themeIcons'
@@ -84,6 +89,12 @@ export function OnboardingModal() {
   const [cloudDevice, setCloudDevice] = useState<CloudDeviceStart | null>(null)
   const [cloudBusy, setCloudBusy] = useState(false)
   const [cloudFailed, setCloudFailed] = useState(false)
+  const [ghConfigured, setGhConfigured] = useState(false)
+  const [ghDevice, setGhDevice] = useState<GithubDeviceStart | null>(null)
+  const [ghBusy, setGhBusy] = useState(false)
+  const [ghFailed, setGhFailed] = useState(false)
+  const [ghOpenFailed, setGhOpenFailed] = useState(false)
+  const [ghLogin, setGhLogin] = useState<string | null>(null)
   const [agentAvailability, setAgentAvailability] = useState<Partial<Record<CodingAgent, boolean>>>(
     {},
   )
@@ -169,6 +180,12 @@ export function OnboardingModal() {
     if (preferences.onboardingDone || agentDetectionStartedRef.current) return
     agentDetectionStartedRef.current = true
     void detectAgents()
+    githubAccountStatus()
+      .then((status) => {
+        setGhConfigured(status.configured)
+        if (status.connected) setGhLogin(status.login)
+      })
+      .catch(() => setGhConfigured(false))
     if (!CLOUD_SYNC_ENABLED) return
     cloudSyncStatus()
       .then((status) => {
@@ -235,6 +252,35 @@ export function OnboardingModal() {
     } finally {
       setCloudDevice(null)
       setCloudBusy(false)
+    }
+  }
+
+  /** Fills the profile from the GitHub account: its name (or login) and its picture. */
+  const applyGithubAccount = (status: GithubAccountStatus) => {
+    const login = status.login
+    if (!login) return
+    setGhLogin(login)
+    setPhotoUrl(status.avatar_url || `https://github.com/${login}.png`)
+    setImgFailed(false)
+    const finalName = name.trim() || status.name || login
+    setName(finalName)
+    setStep((value) => Math.max(value, 1))
+  }
+
+  const signInWithGithubAccount = async () => {
+    setGhBusy(true)
+    setGhFailed(false)
+    setGhOpenFailed(false)
+    try {
+      const start = await githubAccountDeviceStart()
+      setGhDevice(start)
+      openInBrowser(start.verification_uri).catch(() => setGhOpenFailed(true))
+      applyGithubAccount(await githubAccountDeviceFinish(start))
+    } catch {
+      setGhFailed(true)
+    } finally {
+      setGhDevice(null)
+      setGhBusy(false)
     }
   }
 
@@ -392,6 +438,43 @@ export function OnboardingModal() {
                       {t('onboarding.githubSignIn')}
                     </button>
                   )
+                ) : ghConfigured ? (
+                  ghLogin ? null : ghDevice ? (
+                    <div className={styles.deviceFlow}>
+                      <p className={styles.deviceHint}>{t('githubAccount.codeHint')}</p>
+                      <span className={styles.deviceCode}>{ghDevice.user_code}</span>
+                      <button
+                        type="button"
+                        className={styles.deviceLink}
+                        onClick={() =>
+                          openInBrowser(ghDevice.verification_uri).catch(() =>
+                            setGhOpenFailed(true),
+                          )
+                        }
+                      >
+                        {t('githubAccount.openGithub')}
+                      </button>
+                      <span className={styles.deviceAddress}>{ghDevice.verification_uri}</span>
+                      {ghOpenFailed ? (
+                        <p className={styles.deviceHint}>{t('githubAccount.openFailed')}</p>
+                      ) : null}
+                      <p className={styles.deviceHint}>{t('githubAccount.waiting')}</p>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.oauth}
+                      disabled={ghBusy}
+                      onClick={() => void signInWithGithubAccount()}
+                    >
+                      {ghBusy ? (
+                        <Loader2 size={16} className={styles.spin} />
+                      ) : (
+                        <Github size={16} />
+                      )}
+                      {t('onboarding.githubImport')}
+                    </button>
+                  )
                 ) : showGithub ? (
                   <div className={styles.githubRow}>
                     <input
@@ -424,12 +507,16 @@ export function OnboardingModal() {
                     {t('onboarding.githubImport')}
                   </button>
                 )}
-                {cloudFailed ? <p className={styles.note}>{t('onboarding.githubFailed')}</p> : null}
+                {cloudFailed || ghFailed ? (
+                  <p className={styles.note}>{t('onboarding.githubFailed')}</p>
+                ) : null}
 
                 {cloudLogin ? (
                   <p className={styles.note}>
                     {t('onboarding.githubSignedIn', { login: cloudLogin })}
                   </p>
+                ) : ghLogin ? (
+                  <p className={styles.note}>{t('githubAccount.signedInAs', { login: ghLogin })}</p>
                 ) : (
                   <p className={styles.note}>{t('onboarding.localNote')}</p>
                 )}

@@ -36,6 +36,8 @@ Mac synced through: `v1.7.0` (`80e44a3`)
 
 ## Unreleased
 
+- `pending` · `ui` · `c356cc9` feat: Antigravity teams, managed GitHub clones and Home polish
+  - Files: this commit carries the entries listed below under Unreleased (team look, `alethe-team` queue and send, managed clones, own tab per project, Home and About changes, tutorials removal).
 - `pending` · `ui` · feat: tmux-style appearance for an Antigravity team
   - Files: `src/lib/teamView.ts` (teams, member colours from theme tokens, member state from the last output), `src/components/TeamMemberState.tsx`, `src/components/WorkspaceView/TeamStatusBar.tsx`, `src/components/TerminalPane/index.tsx` (numbered and coloured pane, `--team-color`), `src/components/WorkspaceView/ProjectContainer.tsx`. A team is a terminal running Antigravity plus the terminals whose `teamLeaderId` is its id. No persisted data changes.
 - `pending` · `ui` · fix: give the keyboard to a terminal right after it opens
@@ -52,6 +54,8 @@ Mac synced through: `v1.7.0` (`80e44a3`)
   - Files: `src-tauri/src/child_env.rs` (`inherited_agent_session_vars`, `scrub_agent_session`), `src-tauri/src/cli_resolver.rs`. When the app starts with `CLAUDECODE` in its environment, `NO_COLOR`, `CLAUDECODE*`, `CLAUDE_PID` and `CLAUDE_CODE_*` are removed from every terminal it spawns. The Mac app should do the same. No persisted data changes.
 - `pending` · `backend` · feat: a team lead sends tasks to members that are already open
   - Files: `src-tauri/src/tmux_bridge.rs` (`alethe-team send <role> <message>`, event `agent-team-send`), `src/lib/antigravityTeam.ts` (`sendToTeamMember`), `src/lib/agentTeam.ts` (lead and member prompts). The task is typed into the member's terminal with a `[lead]` prefix and Enter is pressed 150 ms later. No persisted data changes.
+- `pending` · `ui` · fix: first-run GitHub sign-in fills the profile, and the device-code screen shows the address
+  - Files: `src/components/modals/OnboardingModal.tsx` (device flow of the GitHub account instead of a typed username; name from `name || login`, picture from `avatar_url`), `src/components/modals/GithubRepoPicker.tsx`, `src-tauri/src/diagnostics.rs` (`open_in_browser` on Windows uses `ShellExecuteW`, with Explorer as fallback; it used to spawn `rundll32` and never reported a failure). The Mac app should show the verification address next to the code and report when the browser cannot be opened. No persisted data changes.
 - `pending` · `ui` · feat: remove the Tutorials tab and the About "Contribute" section
   - Files: `src/components/modals/PreferencesModal.tsx`, `src/components/modals/preferences/AboutPage.tsx`; deleted `TutorialsPage.tsx`, `TutorialsPage.module.css`, `TutorialsPage.test.tsx`, `src/lib/tutorials.ts`; locale keys `tutorials.*`, `prefs.categoryTutorials*` and `prefs.aboutContribute*`, `prefs.aboutReportBug`, `prefs.aboutRequestFeature`, `prefs.aboutOpenPullRequest`, `prefs.aboutContributingGuide` removed. No persisted data changes.
 - `pending` · `ui` · fix: About "Made by" card names Alan Carvalho and drops the social links

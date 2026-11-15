@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const tauri = vi.hoisted(() => ({
@@ -66,5 +66,30 @@ describe('GithubRepoPicker', () => {
 
     await waitFor(() => expect(screen.getByText(/API rate limit exceeded/)).toBeTruthy())
     expect(tauri.githubAccountRepos).toHaveBeenCalledTimes(1)
+  })
+  it('shows the sign-in page address, and says so when the browser cannot be opened', async () => {
+    tauri.githubAccountStatus.mockResolvedValue({
+      configured: true,
+      connected: false,
+      login: null,
+      name: null,
+      avatar_url: null,
+    })
+    tauri.githubAccountDeviceStart.mockResolvedValue({
+      device_code: 'device',
+      user_code: 'ABCD-1234',
+      verification_uri: 'https://github.com/login/device',
+      interval: 5,
+      expires_in: 900,
+    })
+    tauri.githubAccountDeviceFinish.mockReturnValue(new Promise(() => {}))
+    tauri.openInBrowser.mockRejectedValue('no default browser')
+
+    render(<GithubRepoPicker onPick={vi.fn()} />)
+    fireEvent.click(await screen.findByRole('button', { name: /Sign in with GitHub/ }))
+
+    expect(await screen.findByText('ABCD-1234')).toBeTruthy()
+    expect(screen.getByText('https://github.com/login/device')).toBeTruthy()
+    await waitFor(() => expect(screen.getByText(/Could not open the browser/)).toBeTruthy())
   })
 })
