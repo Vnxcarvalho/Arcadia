@@ -2457,7 +2457,7 @@ export const zhCN: Record<MessageKey, string> = {
   'githubAccount.browse': '克隆仓库',
   'githubAccount.signIn': '使用 GitHub 登录',
   'githubAccount.waiting': '正在等待 GitHub…',
-  'githubAccount.codeHint': '请在 GitHub 上输入此代码：',
+  'githubAccount.codeHint': '请在打开的 GitHub 页面中授权 Arcadia。代码：',
   'githubAccount.openGithub': '打开 GitHub',
   'githubAccount.openFailed': '无法打开浏览器。请访问上方地址并输入代码。',
   'githubAccount.signedInAs': '已登录为 {login}',

@@ -6,6 +6,7 @@ import { resolveAgentCliCommand } from '../../lib/agentProviders'
 import { latestVersionFor } from '../../lib/agentVersions'
 import { CLOUD_SYNC_ENABLED } from '../../lib/featureFlags'
 import { FEATURES } from '../../lib/features'
+import { githubAuthorizeUrl } from '../../lib/githubDeviceUrl'
 import { LOCALES, useT } from '../../lib/i18n'
 import { defaultProfileImageUrl, getProfileInitial } from '../../lib/profile'
 import { syncNow } from '../../lib/sync'
@@ -274,7 +275,7 @@ export function OnboardingModal() {
     try {
       const start = await githubAccountDeviceStart()
       setGhDevice(start)
-      openInBrowser(start.verification_uri).catch(() => setGhOpenFailed(true))
+      openInBrowser(githubAuthorizeUrl(start)).catch(() => setGhOpenFailed(true))
       applyGithubAccount(await githubAccountDeviceFinish(start))
     } catch {
       setGhFailed(true)
@@ -447,16 +448,18 @@ export function OnboardingModal() {
                         type="button"
                         className={styles.deviceLink}
                         onClick={() =>
-                          openInBrowser(ghDevice.verification_uri).catch(() =>
+                          openInBrowser(githubAuthorizeUrl(ghDevice)).catch(() =>
                             setGhOpenFailed(true),
                           )
                         }
                       >
                         {t('githubAccount.openGithub')}
                       </button>
-                      <span className={styles.deviceAddress}>{ghDevice.verification_uri}</span>
                       {ghOpenFailed ? (
-                        <p className={styles.deviceHint}>{t('githubAccount.openFailed')}</p>
+                        <>
+                          <span className={styles.deviceAddress}>{ghDevice.verification_uri}</span>
+                          <p className={styles.deviceHint}>{t('githubAccount.openFailed')}</p>
+                        </>
                       ) : null}
                       <p className={styles.deviceHint}>{t('githubAccount.waiting')}</p>
                     </div>

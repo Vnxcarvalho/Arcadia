@@ -2781,7 +2781,7 @@ export const en = {
   'githubAccount.browse': 'Clone repository',
   'githubAccount.signIn': 'Sign in with GitHub',
   'githubAccount.waiting': 'Waiting for GitHub…',
-  'githubAccount.codeHint': 'Enter this code on GitHub:',
+  'githubAccount.codeHint': 'Authorize Arcadia on the GitHub page that opened. Code:',
   'githubAccount.openGithub': 'Open GitHub',
   'githubAccount.openFailed':
     'Could not open the browser. Go to the address above and enter the code.',

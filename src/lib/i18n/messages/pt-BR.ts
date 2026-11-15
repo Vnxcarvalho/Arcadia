@@ -2815,7 +2815,7 @@ export const ptBR: Record<MessageKey, string> = {
   'githubAccount.browse': 'Clonar repositório',
   'githubAccount.signIn': 'Entrar com o GitHub',
   'githubAccount.waiting': 'Aguardando o GitHub…',
-  'githubAccount.codeHint': 'Digite este código no GitHub:',
+  'githubAccount.codeHint': 'Autorize o Arcadia na página do GitHub que abriu. Código:',
   'githubAccount.openGithub': 'Abrir o GitHub',
   'githubAccount.openFailed':
     'Não foi possível abrir o navegador. Acesse o endereço acima e digite o código.',

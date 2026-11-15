@@ -1,6 +1,7 @@
 import { Github, Loader2, Lock } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { githubAuthorizeUrl } from '../../lib/githubDeviceUrl'
 import { useT } from '../../lib/i18n'
 import {
   filterGithubRepos,
@@ -77,7 +78,7 @@ export function GithubRepoPicker({ onPick }: { onPick: (repo: GithubRepo) => voi
       const start = await githubAccountDeviceStart()
       setDevice(start)
       setOpenFailed(false)
-      openInBrowser(start.verification_uri).catch(() => setOpenFailed(true))
+      openInBrowser(githubAuthorizeUrl(start)).catch(() => setOpenFailed(true))
       const next = await githubAccountDeviceFinish(start)
       setStatus(next)
       if (next.connected) void loadRepos()
@@ -118,13 +119,17 @@ export function GithubRepoPicker({ onPick }: { onPick: (repo: GithubRepo) => voi
               type="button"
               className={styles.link}
               onClick={() =>
-                openInBrowser(device.verification_uri).catch(() => setOpenFailed(true))
+                openInBrowser(githubAuthorizeUrl(device)).catch(() => setOpenFailed(true))
               }
             >
               {t('githubAccount.openGithub')}
             </button>
-            <span className={styles.address}>{device.verification_uri}</span>
-            {openFailed ? <p className={styles.error}>{t('githubAccount.openFailed')}</p> : null}
+            {openFailed ? (
+              <>
+                <span className={styles.address}>{device.verification_uri}</span>
+                <p className={styles.error}>{t('githubAccount.openFailed')}</p>
+              </>
+            ) : null}
           </div>
         ) : (
           <button

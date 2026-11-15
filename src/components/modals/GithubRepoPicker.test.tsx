@@ -67,7 +67,7 @@ describe('GithubRepoPicker', () => {
     await waitFor(() => expect(screen.getByText(/API rate limit exceeded/)).toBeTruthy())
     expect(tauri.githubAccountRepos).toHaveBeenCalledTimes(1)
   })
-  it('shows the sign-in page address, and says so when the browser cannot be opened', async () => {
+  it('opens GitHub with the code filled in, and shows the address when the browser cannot be opened', async () => {
     tauri.githubAccountStatus.mockResolvedValue({
       configured: true,
       connected: false,
@@ -89,6 +89,9 @@ describe('GithubRepoPicker', () => {
     fireEvent.click(await screen.findByRole('button', { name: /Sign in with GitHub/ }))
 
     expect(await screen.findByText('ABCD-1234')).toBeTruthy()
+    expect(tauri.openInBrowser).toHaveBeenCalledWith(
+      'https://github.com/login/device?user_code=ABCD-1234',
+    )
     expect(screen.getByText('https://github.com/login/device')).toBeTruthy()
     await waitFor(() => expect(screen.getByText(/Could not open the browser/)).toBeTruthy())
   })

@@ -34,6 +34,10 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 ## [Unreleased]
 
 ), still waits for you.
+- **GitHub sign-in is authorized on the GitHub website, without typing a code.** "Open GitHub" now opens
+  github.com with the code already filled in, so you only confirm your account and press Authorize.
+  The code stays on screen to compare with the page, and the plain address appears only when the
+  browser could not be opened.
 - **Signing in with GitHub in the first-run setup fills your profile.** "Use my GitHub account" now
   signs in through GitHub and uses its name and picture, instead of asking you to type your username.
   The same sign-in also lets you clone your repositories later.
