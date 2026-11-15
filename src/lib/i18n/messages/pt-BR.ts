@@ -1486,6 +1486,12 @@ export const ptBR: Record<MessageKey, string> = {
     'O Alethe agora é Arcadia: novo nome, nova logo e nova arte do instalador. Seus projetos, perfis e configurações continuam onde estão.',
   'whatsNew.v177.note2':
     'A logo do Arcadia agora é o ícone do app e a foto de perfil padrão. Os ícones da arte Elite foram removidos; os temas de cores Elite continuam.',
+  'whatsNew.v1712.note1':
+    'Os times de agentes do Antigravity agora funcionam a partir do sandbox do Antigravity: o líder abre membros e envia tarefas, os terminais ficam como uma sessão tmux e tarefas pequenas terminam bem mais rápido.',
+  'whatsNew.v1712.note2':
+    'Um projeto criado a partir de um link do GitHub agora abre seus terminais no clone. Sem pasta escolhida, o Arcadia mantém uma cópia rasa na própria pasta e a remove junto com o projeto, a menos que haja alterações não enviadas.',
+  'whatsNew.v1712.note3':
+    'Um novo terminal em um projeto que não está na tela abre esse projeto em uma aba própria. O Arcadia sempre abre na tela inicial, o cartão Sobre cita Alan Carvalho e a aba Tutoriais e a seção Contribuir foram removidas.',
   'whatsNew.v1711.note1':
     'Os botões das telas vazias agora dizem Abrir projeto, o botão de clonar do GitHub diz Clonar repositório, o título do terminal da tela inicial é arcadia@workspace e o cartão da versão em Sobre mostra o logo do Arcadia.',
   'whatsNew.v1710.note1':

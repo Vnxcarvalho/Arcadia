@@ -1459,6 +1459,12 @@ export const en = {
     'Alethe is now Arcadia: a new name, a new logo and new installer artwork. Your projects, profiles and settings stay where they are.',
   'whatsNew.v177.note2':
     'The Arcadia logo is now the default app icon and profile picture. The Elite artwork icons are gone; the Elite colour themes stay.',
+  'whatsNew.v1712.note1':
+    "Antigravity agent teams now work from Antigravity's sandbox: the lead opens members and sends them tasks, the terminals look like a tmux session, and small tasks finish much faster.",
+  'whatsNew.v1712.note2':
+    'A project made from a GitHub link now opens its terminals in the clone. With no folder chosen, Arcadia keeps a shallow copy in its own folder and removes it with the project unless it holds unpushed changes.',
+  'whatsNew.v1712.note3':
+    'A new terminal in a project that is not on screen opens that project in its own tab. Arcadia always starts on Home, and the About card names Alan Carvalho; the Tutorials tab and the Contribute section are gone.',
   'whatsNew.v1711.note1':
     'The buttons of the empty screens now say Open project, the GitHub clone button says Clone repository, the Home terminal title reads arcadia@workspace, and the version card in About shows the Arcadia logo.',
   'whatsNew.v1710.note1':
