@@ -278,15 +278,15 @@ jobs:
           NODE
 
       # The NSIS file name carries the version, so a link to it breaks on every release. This
-      # copy has a fixed name, which makes /releases/latest/download/Alethe-Setup.exe always
+      # copy has a fixed name, which makes /releases/latest/download/Arcadia-Setup.exe always
       # serve the newest Windows installer.
       - name: Add a fixed-name copy of the Windows installer
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          gh release download "$VERSION" --repo "$GITHUB_REPOSITORY" --pattern '*-setup.exe' --output Alethe-Setup.exe --clobber
-          gh release upload "$VERSION" Alethe-Setup.exe --repo "$GITHUB_REPOSITORY" --clobber
+          gh release download "$VERSION" --repo "$GITHUB_REPOSITORY" --pattern '*-setup.exe' --output Arcadia-Setup.exe --clobber
+          gh release upload "$VERSION" Arcadia-Setup.exe --repo "$GITHUB_REPOSITORY" --clobber
 
       # Everything above ran against a draft. Promoting it here is what makes the installers
       # downloadable and what lets the updater see the release, so it must stay last: any

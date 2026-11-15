@@ -17,7 +17,7 @@
   </p>
 
   <p align="center">
-    <a href="https://github.com/Vnxcarvalho/Alethe-2.0/releases/latest/download/Alethe-Setup.exe"><b>Baixar o Arcadia para Windows</b></a>
+    <a href="https://github.com/Vnxcarvalho/Arcadia/releases/latest/download/Arcadia-Setup.exe"><b>Baixar o Arcadia para Windows</b></a>
   </p>
 
   <p align="center">
