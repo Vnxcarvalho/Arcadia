@@ -1240,11 +1240,11 @@ export const zhCN: Record<MessageKey, string> = {
     'Alethe 现在叫 Arcadia：全新的名称、标志和安装程序图案。你的项目、配置文件和设置保持不变。',
   'whatsNew.v177.note2':
     'Arcadia 标志现在是默认的应用图标和个人资料头像。Elite 插画图标已移除，Elite 配色主题保留。',
-  'whatsNew.v1712.note1':
+  'whatsNew.v1713.note1':
     'Antigravity 代理团队现在可以在 Antigravity 沙盒中工作：负责人可以打开成员并向其发送任务，终端外观类似 tmux 会话，小任务完成得更快。',
-  'whatsNew.v1712.note2':
+  'whatsNew.v1713.note2':
     '通过 GitHub 链接创建的项目现在会在克隆目录中打开终端。未选择文件夹时，Arcadia 会在自己的文件夹中保留浅克隆，并在删除项目时一并删除，除非其中有尚未推送的更改。',
-  'whatsNew.v1712.note3':
+  'whatsNew.v1713.note3':
     '在当前画面之外的项目中新建终端时，会在该项目自己的标签页中打开。Arcadia 始终从主页启动，“关于”卡片显示 Alan Carvalho，教程标签页和“贡献”部分已移除。',
   'whatsNew.v1711.note1':
     '空状态页面的按钮现在显示“打开项目”，GitHub 克隆按钮显示“克隆仓库”，主页终端标题为 arcadia@workspace，“关于”中的版本卡片显示 Arcadia 标志。',
@@ -1534,7 +1534,8 @@ export const zhCN: Record<MessageKey, string> = {
   'crud.repoClonedTitle': '仓库已克隆',
   'crud.repoClonedBody': '文件夹：{path}',
   'ui.sidebar.cloneKeptTitle': '已保留克隆',
-  'ui.sidebar.cloneKeptBody': '项目已删除，但 {path} 中有尚未推送到 GitHub 的更改，因此保留该文件夹。',
+  'ui.sidebar.cloneKeptBody':
+    '项目已删除，但 {path} 中有尚未推送到 GitHub 的更改，因此保留该文件夹。',
   'ui.sidebar.cloneNotRemovedTitle': '无法删除克隆',
   'crud.repoAlreadyClonedTitle': '仓库已克隆',
   'crud.cloneFolderTaken': '文件夹 {path} 已存在且不为空，并且不是此仓库的克隆。请选择其他文件夹。',

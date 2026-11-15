@@ -357,9 +357,7 @@ export function NewTerminalModal() {
             type="button"
             className={`${controls.btn} ${controls.btnPrimary} ${styles.submitButton}`}
             onClick={() => void submit()}
-            disabled={
-              !context?.projectId || (opensTeam && (roles.length === 0 || !teamHasFolder))
-            }
+            disabled={!context?.projectId || (opensTeam && (roles.length === 0 || !teamHasFolder))}
             title={opensTeam && !teamHasFolder ? t('term.team.needsFolder') : undefined}
           >
             {orchestrating
