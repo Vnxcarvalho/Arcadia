@@ -7,9 +7,11 @@ on:
     branches: [main]
   workflow_call:
 
-# Cancela runs antigos do mesmo branch/PR quando um novo chega.
+# Cancels older runs of the same branch/PR when a new one arrives. The caller's workflow name is
+# part of the group: the Release workflow reuses this file on the same ref, and with a shared group
+# the release's checks and the push's own CI cancelled each other.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
