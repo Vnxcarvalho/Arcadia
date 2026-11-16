@@ -54,6 +54,8 @@ Mac synced through: `v1.7.0` (`80e44a3`)
   - Files: `src-tauri/src/child_env.rs` (`inherited_agent_session_vars`, `scrub_agent_session`), `src-tauri/src/cli_resolver.rs`. When the app starts with `CLAUDECODE` in its environment, `NO_COLOR`, `CLAUDECODE*`, `CLAUDE_PID` and `CLAUDE_CODE_*` are removed from every terminal it spawns. The Mac app should do the same. No persisted data changes.
 - `pending` · `backend` · feat: a team lead sends tasks to members that are already open
   - Files: `src-tauri/src/tmux_bridge.rs` (`alethe-team send <role> <message>`, event `agent-team-send`), `src/lib/antigravityTeam.ts` (`sendToTeamMember`), `src/lib/agentTeam.ts` (lead and member prompts). The task is typed into the member's terminal with a `[lead]` prefix and Enter is pressed 150 ms later. No persisted data changes.
+- `pending` · `ui` · fix: keep the name's case in the Home greeting and free the scrollbar beside a sidebar
+  - Files: `src/lib/greeting.ts` (`greetingLine`), `src/components/HomeView/index.tsx`, `src/App.tsx` (`resizeTargetMinimumSize` fine 18 → 8), `src/App.module.css` (separator hit area only on the sidebar side). The Mac app should not lowercase the first name, and should keep the sidebar resize area from covering the neighbouring view's scrollbar. No persisted data changes.
 - `pending` · `platform` · fix: links open in an installed browser when no default browser is set (Windows)
   - Files: `src-tauri/src/diagnostics.rs` (`shell_execute`, `installed_browser_paths`, `shell_open_windows`). Windows only; the Mac app uses `open`, which has no such gap. No persisted data changes.
 - `pending` · `ui` · fix: GitHub sign-in opens github.com with the code already filled in

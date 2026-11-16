@@ -524,7 +524,9 @@ export default function App() {
         <PanelGroup
           orientation="horizontal"
           className={styles.shellBody}
-          resizeTargetMinimumSize={{ coarse: 28, fine: 18 }}
+          // A mouse needs a narrow target: a wide one sits over the scrollbar of the view next to the
+          // separator and takes its clicks.
+          resizeTargetMinimumSize={{ coarse: 28, fine: 8 }}
         >
           <Panel
             id="alethe-left-sidebar"

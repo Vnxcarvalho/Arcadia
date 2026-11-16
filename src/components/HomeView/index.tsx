@@ -19,10 +19,15 @@ import { useShallow } from 'zustand/react/shallow'
 import homeBackground from '../../assets/home-bg.png'
 import { getCachedActivity } from '../../lib/activityCache'
 import { pickDirectory } from '../../lib/dialog'
-import { formatHomeDate, formatRelativeTimestamp, getGreeting } from '../../lib/greeting'
+import {
+  formatHomeDate,
+  formatRelativeTimestamp,
+  getGreeting,
+  greetingLine,
+} from '../../lib/greeting'
 import { useT, type TFunction } from '../../lib/i18n'
 import { formatShortcut } from '../../lib/platform'
-import { getFirstName, getProfileImageUrl, getProfileInitial } from '../../lib/profile'
+import { getProfileImageUrl, getProfileInitial } from '../../lib/profile'
 import { openInBrowser } from '../../lib/tauri'
 import { getProjectDefaultCwd, useProjectsStore } from '../../stores/projectsStore'
 import { useUiStore } from '../../stores/uiStore'
@@ -185,8 +190,6 @@ export function HomeView() {
   const greeting = useMemo(() => getGreeting(now, language), [now, language])
   const dateStr = useMemo(() => formatHomeDate(now, language), [now, language])
   const displayName = preferences.displayName
-  const firstName = getFirstName(displayName)
-  const firstNameLower = firstName.toLowerCase()
   const avatarUrl = getProfileImageUrl(preferences)
   const initial = getProfileInitial(displayName)
   const quickAgents = QUICK_AGENTS.filter((agent) => preferences.enabledAgents[agent.type])
@@ -288,9 +291,7 @@ export function HomeView() {
             </div>
           </div>
           <div className={styles.heroCopy}>
-            <h1 className={styles.greeting}>
-              {greeting}, {firstNameLower}.
-            </h1>
+            <h1 className={styles.greeting}>{greetingLine(greeting, displayName)}</h1>
           </div>
         </div>
 

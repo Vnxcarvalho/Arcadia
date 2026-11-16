@@ -1,10 +1,16 @@
 import { getLocale, intlLocale, translate, type Locale } from './i18n'
+import { getFirstName } from './profile'
 
 export function getGreeting(date: Date = new Date(), locale: Locale = getLocale()): string {
   const h = date.getHours()
   if (h >= 5 && h < 12) return translate(locale, 'greeting.morning')
   if (h >= 12 && h < 18) return translate(locale, 'greeting.afternoon')
   return translate(locale, 'greeting.evening')
+}
+
+/** The line on the Home: the greeting and the first name, written as the person typed it. */
+export function greetingLine(greeting: string, displayName: string): string {
+  return `${greeting}, ${getFirstName(displayName)}.`
 }
 
 function weekdayShort(date: Date, locale: Locale): string {

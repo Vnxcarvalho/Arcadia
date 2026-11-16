@@ -34,6 +34,11 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 ## [Unreleased]
 
 ), still waits for you.
+- **The Home greeting keeps your name as you wrote it.** "Boa noite, Carvalho." instead of "carvalho".
+- **The scrollbar next to a sidebar can be clicked and dragged again.** The resize area of the sidebar
+  edge was 18 px wide and sat over the scrollbar of the view beside it, so the cursor showed the resize
+  arrows and the scrollbar did not respond. The area is now narrower and reaches only toward the
+  sidebar.
 - **Links open in a browser even when Windows has no default one.** "Open GitHub" opened a folder window
   on a PC without a default browser. Arcadia now tries the default browser, then an installed
   Chrome, Edge, Firefox or Brave, then Edge's own protocol, and only shows the address to open by hand

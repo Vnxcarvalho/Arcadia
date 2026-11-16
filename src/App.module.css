@@ -84,7 +84,8 @@
   content: '';
   position: absolute;
   z-index: 1;
-  inset: 0 -9px;
+  /* Wider only on the far side from the view: its scrollbar sits against the separator. */
+  inset: 0 -9px 0 -1px;
 }
 
 .shellSeparator::before {

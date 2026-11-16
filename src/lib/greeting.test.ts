@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatRelativeTimestamp, getGreeting } from './greeting'
+import { formatRelativeTimestamp, getGreeting, greetingLine } from './greeting'
 
 describe('formatRelativeTimestamp', () => {
   it('retorna travessão para timestamp zero', () => {
@@ -53,5 +53,16 @@ describe('getGreeting', () => {
 
   it('retorna boa noite às 18:00', () => {
     expect(getGreeting(new Date('2026-08-08T18:00:00'), 'en')).toBe('Good evening')
+  })
+})
+
+describe('greetingLine', () => {
+  it('keeps the first name as the person wrote it', () => {
+    expect(greetingLine('Boa noite', 'Carvalho')).toBe('Boa noite, Carvalho.')
+    expect(greetingLine('Good evening', '  alan carvalho ')).toBe('Good evening, alan.')
+  })
+
+  it('falls back to a friendly word when there is no name', () => {
+    expect(greetingLine('Good evening', '   ')).toBe('Good evening, amigo.')
   })
 })
