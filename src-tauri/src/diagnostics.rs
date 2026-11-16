@@ -88,11 +88,9 @@ pub fn open_in_vscode(path: String) -> Result<(), String> {
     result.map(|_| ()).map_err(|e| e.to_string())
 }
 
-/// Opens a URL or path with the program Windows has registered for it. `ShellExecuteW` reports
-/// failure (no default browser, a blocked launcher), which spawning `rundll32` never did, so the
-/// caller can say the page did not open. Explorer is the fallback when the verb is refused.
+/// Hands a target to the shell with the default verb. True when Windows found a program for it.
 #[cfg(target_os = "windows")]
-fn shell_open_windows(target: &str) -> std::io::Result<()> {
+fn shell_execute(target: &str) -> bool {
     use windows_sys::Win32::UI::Shell::ShellExecuteW;
     use windows_sys::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
 
@@ -109,8 +107,57 @@ fn shell_open_windows(target: &str) -> std::io::Result<()> {
             SW_SHOWNORMAL,
         )
     } as isize;
-    if code > 32 {
+    code > 32
+}
+
+/// Browsers that are installed even when none is the default: their paths from `App Paths`.
+#[cfg(target_os = "windows")]
+fn installed_browser_paths() -> Vec<PathBuf> {
+    use winreg::{enums::*, RegKey};
+
+    let mut found = Vec::new();
+    for exe in ["chrome.exe", "msedge.exe", "firefox.exe", "brave.exe"] {
+        let subkey = format!(r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{exe}");
+        for hive in [HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE] {
+            let Ok(key) = RegKey::predef(hive).open_subkey(&subkey) else {
+                continue;
+            };
+            let Ok(value) = key.get_value::<String, _>("") else {
+                continue;
+            };
+            let path = PathBuf::from(value.trim().trim_matches('"'));
+            if path.is_file() {
+                found.push(path);
+                break;
+            }
+        }
+    }
+    found
+}
+
+/// Opens a URL or path with the program Windows has registered for it. `ShellExecuteW` reports
+/// failure, which spawning `rundll32` never did. A web address with no default browser is still
+/// opened: first in an installed browser, then through Edge's own protocol, which every Windows 10
+/// and 11 has. Explorer is only a fallback for paths, never for addresses: it answers an address
+/// it cannot open by showing a folder.
+#[cfg(target_os = "windows")]
+fn shell_open_windows(target: &str) -> std::io::Result<()> {
+    if shell_execute(target) {
         return Ok(());
+    }
+    if target.starts_with("http://") || target.starts_with("https://") {
+        for browser in installed_browser_paths() {
+            if Command::new(&browser).arg(target).spawn().is_ok() {
+                return Ok(());
+            }
+        }
+        if shell_execute(&format!("microsoft-edge:{target}")) {
+            return Ok(());
+        }
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "no browser could be started for the address",
+        ));
     }
     Command::new("explorer").arg(target).spawn().map(|_| ())
 }
@@ -1041,6 +1088,18 @@ mod macos_clipboard {
                 Some("/Users/me/folder")
             );
             assert_eq!(file_url_to_path("https://example.com/a.png"), None);
+        }
+    }
+}
+
+#[cfg(all(test, target_os = "windows"))]
+mod windows_open_tests {
+    use super::installed_browser_paths;
+
+    #[test]
+    fn installed_browsers_are_existing_executables() {
+        for path in installed_browser_paths() {
+            assert!(path.is_file(), "{} is not a file", path.display());
         }
     }
 }

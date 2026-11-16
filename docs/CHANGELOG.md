@@ -34,6 +34,10 @@ Notable user-facing changes to **Arcadia** are documented here. The format is ba
 ## [Unreleased]
 
 ), still waits for you.
+- **Links open in a browser even when Windows has no default one.** "Open GitHub" opened a folder window
+  on a PC without a default browser. Arcadia now tries the default browser, then an installed
+  Chrome, Edge, Firefox or Brave, then Edge's own protocol, and only shows the address to open by hand
+  if none starts. It no longer falls back to Explorer for web addresses.
 - **GitHub sign-in is authorized on the GitHub website, without typing a code.** "Open GitHub" now opens
   github.com with the code already filled in, so you only confirm your account and press Authorize.
   The code stays on screen to compare with the page, and the plain address appears only when the
