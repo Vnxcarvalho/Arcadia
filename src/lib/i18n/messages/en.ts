@@ -1459,6 +1459,10 @@ export const en = {
     'Alethe is now Arcadia: a new name, a new logo and new installer artwork. Your projects, profiles and settings stay where they are.',
   'whatsNew.v177.note2':
     'The Arcadia logo is now the default app icon and profile picture. The Elite artwork icons are gone; the Elite colour themes stay.',
+  'whatsNew.v1718.note1':
+    'The Home greeting keeps your name as you wrote it, so Carvalho no longer turns into carvalho.',
+  'whatsNew.v1718.note2':
+    'The scrollbar next to a sidebar can be dragged again: the resize area of the sidebar edge no longer covers it.',
   'whatsNew.v1717.note1':
     "Links now open even when Windows has no default browser: Arcadia tries the default browser, an installed Chrome, Edge, Firefox or Brave, then Edge's own protocol, instead of showing a folder window.",
   'whatsNew.v1716.note1':

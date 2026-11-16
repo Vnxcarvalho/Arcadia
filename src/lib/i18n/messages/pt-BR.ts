@@ -1486,6 +1486,10 @@ export const ptBR: Record<MessageKey, string> = {
     'O Alethe agora é Arcadia: novo nome, nova logo e nova arte do instalador. Seus projetos, perfis e configurações continuam onde estão.',
   'whatsNew.v177.note2':
     'A logo do Arcadia agora é o ícone do app e a foto de perfil padrão. Os ícones da arte Elite foram removidos; os temas de cores Elite continuam.',
+  'whatsNew.v1718.note1':
+    'A saudação da tela inicial mantém seu nome como você escreveu, então Carvalho não vira mais carvalho.',
+  'whatsNew.v1718.note2':
+    'A barra de rolagem ao lado de uma barra lateral pode ser arrastada de novo: a área de redimensionar da borda da lateral não a cobre mais.',
   'whatsNew.v1717.note1':
     'Os links agora abrem mesmo quando o Windows não tem navegador padrão: o Arcadia tenta o navegador padrão, um Chrome, Edge, Firefox ou Brave instalado e o protocolo do Edge, em vez de mostrar uma janela de pasta.',
   'whatsNew.v1716.note1':

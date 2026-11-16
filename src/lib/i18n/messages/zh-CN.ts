@@ -1240,6 +1240,8 @@ export const zhCN: Record<MessageKey, string> = {
     'Alethe 现在叫 Arcadia：全新的名称、标志和安装程序图案。你的项目、配置文件和设置保持不变。',
   'whatsNew.v177.note2':
     'Arcadia 标志现在是默认的应用图标和个人资料头像。Elite 插画图标已移除，Elite 配色主题保留。',
+  'whatsNew.v1718.note1': '主页问候语会保留你输入的姓名写法，Carvalho 不再变成 carvalho。',
+  'whatsNew.v1718.note2': '侧边栏旁边的滚动条可以再次拖动：侧边栏边缘的调整大小区域不再覆盖它。',
   'whatsNew.v1717.note1':
     '即使 Windows 没有默认浏览器，链接现在也能打开：Arcadia 会依次尝试默认浏览器、已安装的 Chrome、Edge、Firefox 或 Brave，以及 Edge 自己的协议，而不再弹出文件夹窗口。',
   'whatsNew.v1716.note1':
